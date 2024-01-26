@@ -39,7 +39,7 @@ def oxvat_generator():
     db_driver_name = os.getenv("DB_DRIVER_NAME")
 
     # Construct the connection string
-    conn_str = (f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}")
+    conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
 
     engine = create_engine(conn_str)
 
@@ -49,7 +49,6 @@ def oxvat_generator():
 
     # 💀💀💀 EXECUTION!!! ⚠️⚠️⚠️
     df = pd.read_sql_query(sql_query, engine)
-
     df.drop_duplicates(subset=['ИНН клиента'], inplace=True)
 
     # Create a temporary column for comparison without changing the original data type
@@ -62,17 +61,22 @@ def oxvat_generator():
 
     # Drop the temporary column
     df = df.drop(columns=['ИНН клиента_temp'])
-
-    df['Manager'] = df['Менеджер/ка'].str.strip()
+    # making names title case
+    region_df['ClientMan'] = region_df['ClientMan'].str.title()
+    df['ClientMan'] = df['Менеджер/ка'].str.strip().str.title()
     # Merge with 'region_df' DataFrame based on 'ClientMan'
-    df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='Manager', right_on='ClientMan', how='left')
+    df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
 
-    df = df[['Филиал', 'Region', 'Manager', 'ИНН клиента', 'Наименование клиента', 'Лимит клиента', 'Дебиторка',
+    df = df[['Филиал', 'Region', 'ClientMan', 'ИНН клиента', 'Наименование клиента', 'Лимит клиента', 'Дебиторка',
              'Свободный лимит']]
     df = df[df['Свободный лимит'] > 10_000]
-    df.sort_values(by=['Region', 'Manager'], inplace=True)
+    df.sort_values(by=['Region', 'ClientMan'], inplace=True)
 
     df.to_excel(output_file_path, index=False)
-    # Load the existing workbook
 
+    # Load the existing workbook
     formatter(df, output_file_path)
+
+
+if __name__ == '__main__':
+    oxvat_generator()

@@ -50,7 +50,11 @@ def limit_generator():
     df = pd.read_sql_query(sql_query, engine)
 
     # Stripping (trimming column)
+
+    # Making it similiar case title so the data loss is prevented
+    region_df['ClientMan'] = region_df['ClientMan'].str.title()
     df['Manager'] = df['Менеджер/ка'].str.strip()
+    df['Manager'] = df['Manager'].str.title()
 
     # Merge with 'region_df' DataFrame based on 'ClientMan'
     df = pd.merge(df, region_df[['ClientMan', 'Region']],

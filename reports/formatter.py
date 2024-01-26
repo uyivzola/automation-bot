@@ -53,9 +53,8 @@ def formatter(df, output_file_path):
                 formatted_value = "{:,.2f}".format(float(cell.value))
                 cell.value = float(cell.value)
                 cell.style = number_format
-            except (ValueError, TypeError):
-                # Handle cases where the cell value is not a valid number
-                pass
+            except (ValueError, TypeError) as error:
+                print(error)
 
     # Apply background color to all cells in the last column
     for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row, min_col=worksheet.max_column,

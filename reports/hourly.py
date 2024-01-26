@@ -65,9 +65,11 @@ def hourly_generator():
     df['B.Summ'] = df['BasePrice'] * df['Kolich']
     df['TotalAmount'] = df['oPrice'] * df['Kolich']
 
+    region_df['ClientMan'] = region_df['ClientMan'].str.title()
+    df['ClientMan'] = df['ClientMan'].str.title()
+
     df = pd.merge(df, aksiya_df[['Goodid', 'Aksiya']], left_on='Goodid', right_on='Goodid', how='left')
     df = pd.merge(df, paket_df[['Goodid', 'Paket']], left_on='Goodid', right_on='Goodid', how='left')
-
     df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
 
     df['OXVAT'] = df['inn'].map(df['inn'].value_counts())

@@ -5,8 +5,6 @@ import pandas as pd  # For working with DataFrames
 from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
-from reports.formatter import formatter
-
 
 def monthly_generator():
     ##################### LOADING IMPORTANT DATA ######################
@@ -58,10 +56,11 @@ def monthly_generator():
 
     ##################### BASIC FILTER ######################
     df['DataEntered'] = pd.to_datetime(df['DataEntered'])
-    df = df[(df['DataEntered'].dt.month == CURRENT_MONTH) & (df['DataEntered'].dt.year == CURRENT_YEAR) & df[
-        'DocName'].isin(['Оптовая реализация', 'Финансовая скидка', 'Возврат товара от покупателя'])]
+    df = df[(df['DataEntered'].dt.year >= CURRENT_YEAR) & df['DocName'].isin(
+        ['Оптовая реализация', 'Финансовая скидка', 'Возврат товара от покупателя'])]
     df.rename(columns={'GoodId': 'Goodid', 'ClientManager': 'ClientMan', 'INN': 'inn'}, inplace=True)
-
+    region_df['ClientMan'] = region_df['ClientMan'].str.title()
+    df['ClientMan'] = df['ClientMan'].str.title()
     df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
     df = pd.merge(df, aksiya_df[['Goodid', 'Aksiya']], left_on='Goodid', right_on='Goodid', how='left')
     df = pd.merge(df, paket_df[['Goodid', 'Paket']], left_on='Goodid', right_on='Goodid', how='left')
@@ -80,5 +79,4 @@ def monthly_generator():
                            'Paket', 'TYPE', 'RegionType']
     df[categorical_columns] = df[categorical_columns].astype('category')
 
-    df.to_excel(output_file_path, index=False)
-    # formatter(df, output_file_path)
+    df.to_excel(output_file_path, index=False)  # formatter(df, output_file_path)

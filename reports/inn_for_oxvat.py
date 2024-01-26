@@ -9,6 +9,8 @@ from sqlalchemy import create_engine  # For creating a connection engine
 
 CURRENT_MONTH = 1
 CURRENT_YEAR = 2024
+START_DATE = 1
+END_DATE = 31
 
 env_file_path = 'D:/Projects/.env'
 
@@ -37,8 +39,8 @@ def excluded_clients():
     procedure_name = "bGoodSaleWithInfo"
 
     # Set default values for date_begin and date_end if not provided
-    date_begin = datetime(CURRENT_YEAR, CURRENT_MONTH, 1)
-    date_end = datetime(CURRENT_YEAR, CURRENT_MONTH, 31)
+    date_begin = datetime(CURRENT_YEAR, CURRENT_MONTH, START_DATE)
+    date_end = datetime(CURRENT_YEAR, CURRENT_MONTH, END_DATE)
 
     # Format dates as needed
     date_begin_str = date_begin.strftime('%Y%m%d')
@@ -59,8 +61,8 @@ def excluded_clients():
 
     # Filtering basic ones
     result_df['DataEntered'] = pd.to_datetime(result_df['DataEntered'])
-    result_df = result_df[(result_df['DataEntered'].dt.month == 1) &
-                          (result_df['DataEntered'].dt.year == 2024) &
+    result_df = result_df[(result_df['DataEntered'].dt.month == CURRENT_MONTH) &
+                          (result_df['DataEntered'].dt.year == CURRENT_YEAR) &
                           (result_df['DataEntered'].dt.date < bugun) &
                           result_df['DocName'].isin(['Оптовая реализация', 'Финансовая скидка'])]
 
