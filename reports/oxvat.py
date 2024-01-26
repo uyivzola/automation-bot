@@ -52,7 +52,6 @@ def oxvat_generator():
     df = pd.read_sql_query(sql_query, engine)
     print('Clients Limit is ready!')
 
-
     # Perform the comparison
     df = df[~df['ИНН клиента'].isin(problem_clients['INN'])]
     df = df[~df['ИНН клиента'].isin(oxvated_clients['INN'])]
@@ -71,7 +70,7 @@ def oxvat_generator():
 
     df.to_excel(output_file_path, index=False)
     end_time = time.time()
-    print(f"Data Preparation took: {round(end_time - start_time,0)} seconds.")
+    print(f"Data Preparation took: {round(end_time - start_time, 0)} seconds.")
     # Load the existing workbook
     formatter(df, output_file_path)
 

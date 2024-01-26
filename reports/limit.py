@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import time
 from datetime import datetime  # For working with dates
 
 import pandas as pd  # For working with DataFrames
@@ -12,6 +13,8 @@ from sqlalchemy import create_engine  # For creating a connection engine
 
 
 def limit_generator():
+    print('Started running Limit')
+    start_time = time.time()
     # Load environment variables from the .env file
     env_file_path = 'D:/Projects/.env'
     load_dotenv(env_file_path)
@@ -28,7 +31,6 @@ def limit_generator():
     db_user = os.getenv("DB_USER")
     db_password = os.getenv("DB_PASSWORD")
     db_port = os.getenv("DB_PORT")
-
     db_driver_name = os.getenv("DB_DRIVER_NAME")
 
     # Construct the connection string
@@ -39,8 +41,6 @@ def limit_generator():
 
     # Build the SQL query with parameterized query
     sql_query = f""" EXEC {procedure_name} """
-
-
 
     # 💀💀💀 EXECUTION!!! ⚠️⚠️⚠️
     df = pd.read_sql_query(sql_query, engine)
@@ -57,8 +57,11 @@ def limit_generator():
              'Свободный лимит']]
     df = df[df['Свободный лимит'] > 200_000]
     df.sort_values(by=['Region', 'ClientMan'], inplace=True)
+    df.rename(columns={'Region': 'Регион', 'ClientMan': "Ответственный Менеджер"}, inplace=True)
+    end_time = time.time()
     df.to_excel(output_file_path, index=False)
-
+    print(f"Data Preparation took: {round(end_time - start_time, 0)} seconds.")
+    print(f"Its time to format💅🏻")
     # Load the existing workbook
     workbook = load_workbook(output_file_path)
 
@@ -123,6 +126,6 @@ def limit_generator():
     for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row, min_col=1, max_col=worksheet.max_column):
         for cell in row:
             cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
-                bottom=Side(style='thin'))
+                                 bottom=Side(style='thin'))
 
     workbook.save(output_file_path)
