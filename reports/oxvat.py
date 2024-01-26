@@ -14,6 +14,7 @@ from reports.inn_for_oxvat import excluded_clients
 def oxvat_generator():
     print('Started running oxvat_generator')
     oxvated_clients = excluded_clients()
+    print('Started Gathering Clients Limit')
     start_time = time.time()
 
     # Load environment variables from the file
@@ -28,7 +29,7 @@ def oxvat_generator():
     # Load data from different sheets in 'promotion.xlsx' into DataFrames
     region_df = pd.read_excel(promotion_path, sheet_name='Region')
     problem_clients = pd.read_excel(promotion_path, sheet_name='problemClients')
-    problem_clients['INN'] = problem_clients['INN'].astype(int)
+    # problem_clients['INN'] = problem_clients['INN'].astype(int)
 
     # Access the environment variables
     db_server = os.getenv("DB_SERVER")
@@ -49,18 +50,14 @@ def oxvat_generator():
 
     # 💀💀💀 EXECUTION!!! ⚠️⚠️⚠️
     df = pd.read_sql_query(sql_query, engine)
-    df.drop_duplicates(subset=['ИНН клиента'], inplace=True)
+    print('Clients Limit is ready!')
 
-    # Create a temporary column for comparison without changing the original data type
-    df['ИНН клиента_temp'] = pd.to_numeric(df['ИНН клиента'], errors='coerce')
 
     # Perform the comparison
-    df = df[~df['ИНН клиента_temp'].isin(problem_clients['INN'])]
-    df = df[~df['ИНН клиента_temp'].isin(oxvated_clients['INN'])]
+    df = df[~df['ИНН клиента'].isin(problem_clients['INN'])]
+    df = df[~df['ИНН клиента'].isin(oxvated_clients['INN'])]
     # df = df[~df['ИНН клиента_temp'].isin(problem_clients['INN'].tolist() + oxvated_clients['INN'].tolist())]
 
-    # Drop the temporary column
-    df = df.drop(columns=['ИНН клиента_temp'])
     # making names title case
     region_df['ClientMan'] = region_df['ClientMan'].str.title()
     df['ClientMan'] = df['Менеджер/ка'].str.strip().str.title()
@@ -73,7 +70,8 @@ def oxvat_generator():
     df.sort_values(by=['Region', 'ClientMan'], inplace=True)
 
     df.to_excel(output_file_path, index=False)
-
+    end_time = time.time()
+    print(f"Data Preparation took: {round(end_time - start_time,0)} seconds.")
     # Load the existing workbook
     formatter(df, output_file_path)
 

@@ -63,13 +63,12 @@ def excluded_clients():
     result_df['DataEntered'] = pd.to_datetime(result_df['DataEntered'])
     result_df = result_df[(result_df['DataEntered'].dt.month == CURRENT_MONTH) &
                           (result_df['DataEntered'].dt.year == CURRENT_YEAR) &
-                          (result_df['DataEntered'].dt.date < bugun) &
                           result_df['DocName'].isin(['Оптовая реализация', 'Финансовая скидка'])]
 
     # UNIQUE INNs
     # result_df.drop_duplicates(subset=['INN'], inplace=True)
-    result_df['INN'] = pd.to_numeric(result_df['INN'], errors='coerce')
+    # result_df['INN'] = pd.to_numeric(result_df['INN'], errors='coerce')
     result_df = result_df[['INN']]
     time2 = time.time()
-    print(f'Prepared oxvated clients in {time2 - time1} seconds.')
+    print(f'Clients list took {round(time2 - time1,0)} seconds.')
     return result_df
