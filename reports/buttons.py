@@ -1,9 +1,11 @@
 # buttons.py
 import os
+import random
 from datetime import datetime
 
 import requests
 
+from reports.gulya_jokes import gulya_opa_jokes
 from reports.hourly import hourly_generator
 from reports.limit import limit_generator
 from reports.montly import monthly_generator
@@ -12,24 +14,32 @@ from reports.to_finskidka import to_finskidka_generator
 from reports.top import top_generator
 
 
-async def facts_about_cats(update, context):
-    req = requests.get("https://cat-fact.herokuapp.com/facts/random?animal_type=cat&amount=5", verify=False)
+async def chuck_norris_jokes(update, context):
+    req = requests.get("https://api.chucknorris.io/jokes/random", verify=False)
 
     if req.status_code == 200:
         # Parse the JSON response
         response_json = req.json()
 
         # Extract the "text" values from each item in the response
-        texts = [item["text"] for item in response_json]
-
+        # texts = [item["value"] for item in response_json]
+        text = response_json["value"]
         # Print the extracted text values
-        for text in texts:
-            print(text)
-            await update.message.reply_text(f"{text}")
+        # for text in texts:
+        print(text)
+        await update.message.reply_text(f"{text}")
     else:
         # Print an error message if the request was not successful
         print(f"Error: {req.status_code}")
         await update.message.reply_text(f"{req.status_code}")
+
+
+async def gulya_jokes(update, context):
+    joke = random.choice(gulya_opa_jokes)
+    print(joke)
+    await update.message.reply_text(joke)
+    # for joke in gulya_opa_jokes:
+    #     await update.message.reply_text(joke)
 
 
 async def oxvat(update, context):
@@ -229,5 +239,5 @@ async def monthly(update, context):
 
 
 button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP🔄️': top, 'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
-                    'FINSKIDKA📈': to_finskidka,
-                    'Facts about cats🐈': facts_about_cats}
+                    'FINSKIDKA📈': to_finskidka, 'Jokes about Gulya😅': gulya_jokes,
+                    '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes}
