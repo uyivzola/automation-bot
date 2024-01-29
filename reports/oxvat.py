@@ -66,6 +66,7 @@ def oxvat_generator():
     df = df[['Филиал', 'Region', 'ClientMan', 'ИНН клиента', 'Наименование клиента', 'Лимит клиента', 'Дебиторка',
              'Свободный лимит']]
     df = df[df['Свободный лимит'] > 10_000]
+    df.drop_duplicates(subset='ИНН клиента', inplace=True)
     df.sort_values(by=['Region', 'ClientMan'], inplace=True)
 
     df.to_excel(output_file_path, index=False)
