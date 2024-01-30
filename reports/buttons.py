@@ -1,7 +1,6 @@
 # buttons.py
 import os
 import random
-import time
 from datetime import datetime
 
 import requests
@@ -30,8 +29,7 @@ async def chuck_norris_jokes(update, context):
         text = response_json["value"]
         # Print the extracted text VALUE
         print(text)
-        await message.edit_text(text)
-        # await update.message.delete()
+        await message.edit_text(text)  # await update.message.delete()
 
     else:
         # Print an error message if the request was not successful
@@ -59,7 +57,6 @@ async def gulya_jokes(update, context):
 
 
 async def oxvat(update, context):
-    user = update.message.from_user
     chat_id = update.message.chat_id
     message_id = update.message.message_id
 
@@ -110,9 +107,8 @@ async def top(update, context):
 
         # Open and send the document
         document = open(file_name, 'rb')
-        await context.bot.send_document(chat_id, document,
-                                        caption=f"Asklepiy Distribution Skladidagi Tovarlar ro'yxati📑. \n\n\n\n\n"
-                                                f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
+        await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
+                                                                   f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                         reply_to_message_id=message_id)
 
         # Delete the preliminary message
@@ -127,7 +123,6 @@ async def top(update, context):
 
 async def limit(update, context):
     user = update.message.from_user
-    username = user.first_name
     message_id = update.message.message_id
 
     today_date = datetime.now().strftime('%d %b')
@@ -147,9 +142,8 @@ async def limit(update, context):
 
         # Open and send the document
         document = open(file_name, 'rb')
-        await context.bot.send_document(chat_id, document,
-                                        caption=f"Savdoyingizga baraka bersin!🤲🏼💸, Hurmatli {username}!😻\n \n\n"
-                                                f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
+        await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
+                                                                   f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                         reply_to_message_id=message_id)
 
         # Delete the preliminary message
@@ -270,4 +264,4 @@ async def monthly(update, context):
 
 button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP🔄️': top, 'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
                     'FINSKIDKA📈': to_finskidka, 'Jokes about Gulya😅': gulya_jokes,
-                    '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes}
+                    '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes, }
