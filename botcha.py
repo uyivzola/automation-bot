@@ -17,6 +17,7 @@ bot.
 import logging
 # -*- coding: UTF-8 -*-
 import os
+from datetime import datetime
 
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardMarkup
@@ -39,6 +40,21 @@ button_texts = list(button_functions.keys())
 buttons = ReplyKeyboardMarkup([button_texts[i:i + 2] for i in range(0, len(button_texts), 2)])
 
 
+def log_user_message(user, message):
+    # Get current timestamp
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    # Format the log message
+    log_message = (f'{timestamp} - UserID: {user.id}, '
+                   f'User: {user.username}, '
+                   f'First Name: {user.first_name}, '
+                   f'Message: {message}\n')
+
+    # Write the log message to a file
+    with open('log.txt', 'a', encoding='utf-8') as log_file:
+        log_file.write(log_message)
+
+
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -54,8 +70,12 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     button_text = update.message.text
+    message_text: str = update.message.text
+    user = update.message.from_user
+
     # Use the button_functions dictionary to get the corresponding function
     button_function = button_functions.get(button_text)
+    log_user_message(user, message_text)
 
     if button_function:
         # If the function exists, call it
