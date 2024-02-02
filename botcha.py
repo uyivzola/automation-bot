@@ -53,17 +53,18 @@ def log_user_message(user, message):
     # Write the log message to a file
     with open('log.txt', 'a', encoding='utf-8') as log_file:
         log_file.write(log_message)
+    print(log_message)
 
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
-async def start(update: Update) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_html(rf"Hi {user.mention_html()}cek!", reply_markup=buttons)
 
 
-async def help_command(update: Update) -> None:
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 

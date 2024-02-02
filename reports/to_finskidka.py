@@ -5,8 +5,6 @@ import pandas as pd  # For working with DataFrames
 from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
-from reports.formatter import formatter
-
 
 def to_finskidka_generator():
     ##################### LOADING IMPORTANT DATA ######################

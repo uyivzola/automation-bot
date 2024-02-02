@@ -7,15 +7,17 @@ import pandas as pd  # For working with DataFrames
 from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
-CURRENT_MONTH = 1
+CURRENT_MONTH = 2
 CURRENT_YEAR = 2024
 START_DATE = 1
-END_DATE = 31
+END_DATE = 29
+END_MONTH = 3
 
 env_file_path = 'D:/Projects/.env'
 
 
 def excluded_clients():
+    print('Generating Excluded Clients list')
     time1 = time.time()
     # Load environment variables from the .env file
     load_dotenv(env_file_path)
@@ -32,15 +34,14 @@ def excluded_clients():
 
     # Construct the connection string
     conn_str = (
-        f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database_askglobal}?driver={db_driver_name}"
-    )
+        f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database_askglobal}?driver={db_driver_name}")
 
     engine = create_engine(conn_str)
     procedure_name = "bGoodSaleWithInfo"
 
     # Set default values for date_begin and date_end if not provided
     date_begin = datetime(CURRENT_YEAR, CURRENT_MONTH, START_DATE)
-    date_end = datetime(CURRENT_YEAR, CURRENT_MONTH, END_DATE)
+    date_end = datetime(CURRENT_YEAR, END_MONTH, END_DATE)
 
     # Format dates as needed
     date_begin_str = date_begin.strftime('%Y%m%d')
@@ -61,14 +62,14 @@ def excluded_clients():
 
     # Filtering basic ones
     result_df['DataEntered'] = pd.to_datetime(result_df['DataEntered'])
-    result_df = result_df[(result_df['DataEntered'].dt.month == CURRENT_MONTH) &
-                          (result_df['DataEntered'].dt.year == CURRENT_YEAR) &
-                          result_df['DocName'].isin(['Оптовая реализация', 'Финансовая скидка'])]
+    result_df = result_df[
+        (result_df['DataEntered'].dt.month == CURRENT_MONTH) & (result_df['DataEntered'].dt.year == CURRENT_YEAR) &
+        result_df['DocName'].isin(['Оптовая реализация', 'Финансовая скидка'])]
 
     # UNIQUE INNs
     # result_df.drop_duplicates(subset=['INN'], inplace=True)
     # result_df['INN'] = pd.to_numeric(result_df['INN'], errors='coerce')
     result_df = result_df[['INN']]
     time2 = time.time()
-    print(f'Clients list took {round(time2 - time1,0)} seconds.')
+    print(f'Clients list took {round(time2 - time1, 0)} seconds.')
     return result_df
