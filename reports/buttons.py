@@ -12,6 +12,7 @@ from reports.montly import monthly_generator
 from reports.oxvat import oxvat_generator
 from reports.to_finskidka import to_finskidka_generator
 from reports.top import top_generator
+from reports.top_products_sold import top_product_sold_generator
 
 
 async def chuck_norris_jokes(update, context):
@@ -19,23 +20,28 @@ async def chuck_norris_jokes(update, context):
     message_text = update.message.text
     message = await update.message.reply_text(f"i am thinking about the joke about {message_text}",
                                               reply_to_message_id=message_id)
+    try:
+        req = requests.get("https://api.chucknorris.io/jokes/random", verify=False)
 
-    req = requests.get("https://api.chucknorris.io/jokes/random", verify=False)
+        if req.status_code == 200:
+            # Parse the JSON response
+            response_json = req.json()
 
-    if req.status_code == 200:
-        # Parse the JSON response
-        response_json = req.json()
+            text = response_json["value"]
+            # Print the extracted text VALUE
+            print(text)
+            await message.edit_text(text)  # await update.message.delete()
 
-        text = response_json["value"]
-        # Print the extracted text VALUE
-        print(text)
-        await message.edit_text(text)  # await update.message.delete()
-
-    else:
-        # Print an error message if the request was not successful
-        await message.delete()
-        print(f"Error: {req.status_code}")
-        await update.message.reply_text(f"{req.status_code}", reply_to_message_id=message_id)
+        else:
+            # Print an error message if the request was not successful
+            await message.delete()
+            print(f"Error: {req.status_code}")
+            await update.message.reply_text(f"{req.status_code}", reply_to_message_id=message_id)
+    except Exception as e:
+        # Handle exceptions and reply with an error message
+        error_message = f'Error sending the file: {str(e)}'
+        print(error_message)
+        await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
 async def gulya_jokes(update, context):
@@ -43,17 +49,22 @@ async def gulya_jokes(update, context):
     message_text = update.message.text
     message = await update.message.reply_text(f"i am thinking about the joke about {message_text}",
                                               reply_to_message_id=message_id)
-
-    joke = random.choice(gulya_opa_jokes)
-    if joke:
-        # time.sleep(1)
-        # await message.delete()
-        # time.sleep(1)
-        await message.edit_text(joke)
-        print(joke)
-    else:
-        await message.delete(message_id)
-        await update.message.reply_text("Sorry, I couldn't find any joke :(", reply_to_message_id=message_id)
+    try:
+        joke = random.choice(gulya_opa_jokes)
+        if joke:
+            # time.sleep(1)
+            # await message.delete()
+            # time.sleep(1)
+            await message.edit_text(joke)
+            print(joke)
+        else:
+            await message.delete(message_id)
+            await update.message.reply_text("Sorry, I couldn't find any joke :(", reply_to_message_id=message_id)
+    except Exception as e:
+        # Handle exceptions and reply with an error message
+        error_message = f'Error sending the file: {str(e)}'
+        print(error_message)
+        await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
 async def oxvat(update, context):
@@ -262,6 +273,32 @@ async def monthly(update, context):
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
-button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP🔄️': top, 'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
-                    'FINSKIDKA📈': to_finskidka, 'Jokes about Gulya😅': gulya_jokes,
-                    '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes, }
+async def top_products_sold(update, context):
+    message_id = update.message.message_id
+    chat_id = update.message.chat_id
+
+    file_name = 'TOP_PRODUCTS_SOLD.xlsx'
+    message = await update.message.reply_text(
+        f"Sizning so\'rovingiz bo\'yicha  \n *TOP PRODUCTS SOLD\.xlsx* \n fayl tayyorlanmoqda😎 "
+        "Iltimos kuting⌛⌛⌛ \(o\'rtacha 2 daqiqa\)", parse_mode='MarkdownV2', reply_to_message_id=message_id)
+    try:
+        top_product_sold_generator()
+        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
+
+        # Open and send the document
+        document = open(file_name, 'rb')
+        await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
+                                                                   f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
+                                        reply_to_message_id=message_id)
+
+        await message.delete()
+    except Exception as e:
+        # Handle exceptions and reply with an error message
+        error_message = f'Error sending the file: {str(e)}'
+        print(error_message)
+        await update.message.reply_text(error_message, reply_to_message_id=message_id)
+
+
+button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP OSTATOK🔄️': top, 'HOURLY⏳': hourly,
+                    '️Monthly  ⛏️️️': monthly, 'FINSKIDKA📈': to_finskidka, '🔝 TOP PRODUCTS SOLD': top_products_sold,
+                    'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes, }
