@@ -5,6 +5,7 @@ from datetime import datetime
 
 import requests
 
+from reports.google_sheets import upload_to_google_sheet
 from reports.gulya_jokes import gulya_opa_jokes
 from reports.hourly import hourly_generator
 from reports.limit import limit_generator
@@ -88,7 +89,7 @@ async def oxvat(update, context):
         await context.bot.send_document(chat_id, document,
                                         caption=f"\n\n\n🔁Updated: {modification_time.strftime('%d %B, %H:%M')} ⌚",
                                         reply_to_message_id=message_id)
-
+        upload_to_google_sheet(file_name)
         # Delete the preliminary message
         await message.delete()
 
@@ -121,7 +122,7 @@ async def top(update, context):
         await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
                                                                    f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                         reply_to_message_id=message_id)
-
+        upload_to_google_sheet(file_name)
         # Delete the preliminary message
         await message.delete()
 
@@ -156,6 +157,7 @@ async def limit(update, context):
         await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
                                                                    f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                         reply_to_message_id=message_id)
+        upload_to_google_sheet(file_name)
 
         # Delete the preliminary message
         await message.delete()
@@ -192,7 +194,7 @@ async def hourly(update, context):
                                         caption=f"Analitikangizga aniqlik tilayman!📈, {first_name}💋💖!\n \n\n"
                                                 f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                         reply_to_message_id=message_id)
-
+        upload_to_google_sheet(file_name)
         # Delete the preliminary message
         await message.delete()  # Send a final message
 
@@ -228,7 +230,7 @@ async def to_finskidka(update, context):
                                         caption=f"Analitikangizga aniqlik tilayman!📈, {username}!\n \n\n"
                                                 f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                         reply_to_message_id=message_id)
-
+        upload_to_google_sheet(file_name)
         # Delete the preliminary message
         await message.delete()  # Send a final message
 
@@ -265,6 +267,7 @@ async def monthly(update, context):
         spoiler_text = ("|| Nixxuya charchatvordiz oka\!"
                         " Rosa qiynaldim formatlagani\, blin\! ||")
         await update.message.reply_text(spoiler_text, parse_mode='MarkdownV2')
+        upload_to_google_sheet(file_name)
 
     except Exception as e:
         # Handle exceptions and reply with an error message
@@ -290,7 +293,7 @@ async def top_products_sold(update, context):
         await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
                                                                    f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                         reply_to_message_id=message_id)
-
+        upload_to_google_sheet(file_name)
         await message.delete()
     except Exception as e:
         # Handle exceptions and reply with an error message

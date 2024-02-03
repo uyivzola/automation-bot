@@ -33,7 +33,7 @@ def monthly_generator():
     procedure_name = os.getenv("MONTHLY")  # THIS IS HOURLY DATA GATHERING
 
     # Set default values for date_begin and date_end if not provided
-    date_begin = datetime(2024, 2, 1).strftime('%Y%m%d')
+    date_begin = datetime(2024, 1, 1).strftime('%Y%m%d')
     date_end = datetime(2024, 3, 31).strftime('%Y%m%d')
     CURRENT_MONTH = 2
     CURRENT_YEAR = 2024

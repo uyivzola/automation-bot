@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
 from reports.formatter import formatter
+from reports.google_sheets import upload_to_google_sheet
 
 
 def hourly_generator():
@@ -31,7 +32,7 @@ def hourly_generator():
     db_driver_name = os.getenv("DB_DRIVER_NAME")
 
     ##################### PROCEDURE NAME ######################
-    procedure_name = os.getenv("HOURLY")  # THIS IS HOURLY DATA GATHERING
+    procedure_name = os.getenv("HOURLY_SHORT")  # THIS IS HOURLY DATA GATHERING
 
     ##################### DATE - JANUARY ######################
     CURRENT_MONTH = 1
@@ -97,7 +98,6 @@ def hourly_generator():
 
     ##################### FORMAT THE TABLE  ######################
     formatter(df, output_file_path)
-
     ##################### MODIFIED TIME OF THE FILE ######################
 
     if os.path.exists(output_file_path):
