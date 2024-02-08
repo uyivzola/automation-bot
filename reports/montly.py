@@ -5,9 +5,12 @@ import pandas as pd  # For working with DataFrames
 from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
+from reports.formatter import formatter
+
 
 def monthly_generator():
     ##################### LOADING IMPORTANT DATA ######################
+    print('Started running monthly generator')
     # Load environment variables from the .env file
 
     env_file_path = 'D:/Projects/.env'
@@ -33,7 +36,7 @@ def monthly_generator():
     procedure_name = os.getenv("MONTHLY")  # THIS IS HOURLY DATA GATHERING
 
     # Set default values for date_begin and date_end if not provided
-    date_begin = datetime(2024, 1, 1).strftime('%Y%m%d')
+    date_begin = datetime(2024, 2, 1).strftime('%Y%m%d')
     date_end = datetime(2024, 3, 31).strftime('%Y%m%d')
     CURRENT_MONTH = 2
     CURRENT_YEAR = 2024
@@ -79,4 +82,5 @@ def monthly_generator():
                            'Paket', 'TYPE', 'RegionType']
     df[categorical_columns] = df[categorical_columns].astype('category')
 
-    df.to_excel(output_file_path, index=False)  # formatter(df, output_file_path)
+    df.to_excel(output_file_path, index=False)
+    formatter(df, output_file_path)
