@@ -14,6 +14,7 @@ from reports.oxvat import oxvat_generator
 from reports.to_finskidka import to_finskidka_generator
 from reports.top import top_generator
 from reports.top_products_sold import top_product_sold_generator
+import locale
 
 
 async def chuck_norris_jokes(update, context):
@@ -101,7 +102,7 @@ async def oxvat(update, context):
 
 
 async def top(update, context):
-    user = update.message.from_user
+    users_message = update.message
     chat_id = update.message.chat_id
     message_id = update.message.message_id
 
@@ -125,6 +126,7 @@ async def top(update, context):
         upload_to_google_sheet(file_name)
         # Delete the preliminary message
         await message.delete()
+        # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
 
     except Exception as e:
         # Handle exceptions and reply with an error message
@@ -159,9 +161,9 @@ async def limit(update, context):
                                         reply_to_message_id=message_id)
         upload_to_google_sheet(file_name)
 
-        # Delete the preliminary message
+        # Delete the preliminary message2w/
         await message.delete()
-
+        # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
@@ -276,24 +278,37 @@ async def monthly(update, context):
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
-async def top_products_sold(update, context):
+async def top_high_fav(update, context):
     message_id = update.message.message_id
     chat_id = update.message.chat_id
+    locale.setlocale(locale.LC_TIME, 'ru_RU')
+    # Get the current date
+    current_date = datetime.now()
+    formatted_date = f'{current_date.day} {current_date.strftime("%B")}'
 
-    file_name = 'TOP_PRODUCTS_SOLD.xlsx'
+    top_revenue_file = 'TOP_PRODUCTS_SOLD.xlsx'
+    top_files = {
+        'TOP_REVENUE_PRODUCTS_SOLD.xlsx': 'Товары, приносящие наибольший доход, среди клиентов в различных регионах и типах на',
+        'HIGH_VOLUME_PRODUCTS.xlsx': 'Товары с наибольшим объемом(колич) продаж среди клиентов в различных регионах и типах на',
+        'CLIENT_FAVORITE_PRODUCTS.xlsx': 'Товары, популярные среди клиентов в различных регионах и разных типов на'
+    }
     message = await update.message.reply_text(
-        f"Sizning so\'rovingiz bo\'yicha  \n *TOP PRODUCTS SOLD\.xlsx* \n fayl tayyorlanmoqda😎 "
-        "Iltimos kuting⌛⌛⌛ \(o\'rtacha 2 daqiqa\)", parse_mode='MarkdownV2', reply_to_message_id=message_id)
+        f'Sizning so\'rovingiz bo\'yicha  \n *TOP REVENUE PRODUCTS SOLD\.xlsx* \n fayl tayyorlanmoqda😎 '
+        'Iltimos kuting⌛⌛⌛ \(o\'rtacha 2 daqiqa\)', parse_mode='MarkdownV2', reply_to_message_id=message_id)
     try:
         top_product_sold_generator()
-        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
+        # modification_time = datetime.fromtimestamp(os.path.getmtime(top_revenue_file))
 
         # Open and send the document
-        document = open(file_name, 'rb')
-        await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
-                                                                   f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
-                                        reply_to_message_id=message_id)
-        upload_to_google_sheet(file_name)
+        for file, file_desc in top_files.items():
+            document = open(file, 'rb')
+            caption_text = f"\n\n{file_desc}\n<b><u>{formatted_date}</u></b>\n\n"
+
+            await context.bot.send_document(chat_id, document,
+                                            caption=caption_text,
+                                            parse_mode='HTML',
+                                            reply_to_message_id=message_id)
+
         await message.delete()
     except Exception as e:
         # Handle exceptions and reply with an error message
@@ -302,6 +317,13 @@ async def top_products_sold(update, context):
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
-button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP OSTATOK🔄️': top, 'HOURLY⏳': hourly,
-                    '️Monthly  ⛏️️️': monthly, 'FINSKIDKA📈': to_finskidka, '🔝 TOP PRODUCTS SOLD': top_products_sold,
-                    'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes, }
+button_functions = {'LIMIT💸': limit,
+                    'OXVAT🙈': oxvat,
+                    'TOP OSTATOK🔄️': top,
+                    '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
+                    'HOURLY⏳': hourly,
+                    '️Monthly  ⛏️️️': monthly,
+                    'FINSKIDKA📈': to_finskidka,
+                    'Jokes about Gulya😅': gulya_jokes,
+                    '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes
+                    }
