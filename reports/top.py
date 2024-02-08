@@ -26,7 +26,7 @@ def top_generator():
     db_driver_name = os.getenv("DB_DRIVER_NAME")
 
     # Construct the connection string
-    conn_str = (f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}")
+    conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
 
     procedure_name = "bGoodByIncome_Dilshod"
     engine = create_engine(conn_str)
