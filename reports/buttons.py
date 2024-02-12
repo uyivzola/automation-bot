@@ -107,7 +107,7 @@ async def top(update, context):
     message_id = update.message.message_id
 
     today_date = datetime.now().strftime('%d %b')
-    file_name = f'TOP ostatok - {today_date}.xlsx'
+    file_names = [f'TOP ostatok - {today_date}.xlsx', f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx']
     # Send a preliminary message
     message = await update.message.reply_text(
         f"Sizning so\'rovingiz bo\'yicha \n *TOP ostatok \- {today_date}\.xlsx* \nfayl tayyorlanmoqda😎 "
@@ -115,16 +115,13 @@ async def top(update, context):
     try:
 
         top_generator()
-        # Check the modification time of the file
-        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
 
         # Open and send the document
-        document = open(file_name, 'rb')
-        await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
-                                                                   f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
-                                        reply_to_message_id=message_id)
-        upload_to_google_sheet(file_name)
-        # Delete the preliminary message
+        for file in file_names:
+            document = open(file, 'rb')
+            print(f'Sending {file}')
+            await context.bot.send_document(chat_id, document, reply_to_message_id=message_id)
+        # upload_to_google_sheet(file_name)
         await message.delete()
         # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
 
