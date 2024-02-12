@@ -16,6 +16,7 @@ def top_generator():
     # Get today's date
     today_date = datetime.now().strftime('%d %b')
     output_file_path = f'TOP ostatok - {today_date}.xlsx'
+    xikmat_file_path = f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx'
 
     # Access the environment variables
     db_server = os.getenv("DB_SERVER")
@@ -41,8 +42,8 @@ def top_generator():
 
     # Rename columns
     result_df.columns = ['Компания', 'Код товара', 'Товар', 'Производитель', 'Серия', 'Склад', 'Субсклад',
-                         'Дата прихода', 'Дней до срока годн.', 'П.Цена', 'П.Кол-во', 'На брони', 'Своб. Остаток']
-
+                         'Дата прихода', 'Дней до срока годн.', 'П.Цена', 'П.Кол-во', 'На брони', 'Своб. Остаток',
+                         'Selling Price']
     # Only "Асклепий" data!!!
     result_df = result_df[result_df['Компания'] == 'Асклепий']
 
@@ -50,7 +51,7 @@ def top_generator():
     result_df['Товар'] = result_df['Товар'].str.strip()
     result_df['Производитель'] = result_df['Производитель'].str.strip()
 
-    # Add new columns
+    # Add new columns #UNIVERSAL ONE
     result_df['остаток'] = result_df['На брони'] + result_df['Своб. Остаток']
     result_df['сумма'] = result_df['П.Цена'] * result_df['остаток']
 
@@ -59,6 +60,16 @@ def top_generator():
 
     # Sort the DataFrame by 'Sum of сумма' in descending order
     df = pivoted_df.sort_values(by='сумма', ascending=False)
-    df.to_excel(output_file_path, index=False)
 
+    # special for Xikmat
+    manufacturers = ["Ever neuro pharma", "Ромфарм Компании - Румыния", "Ромфарм Комп/World Medicine"]
+    xikmat_df = result_df[result_df['Производитель'].isin(manufacturers)]
+    xikmat_df = xikmat_df.groupby(['Производитель', 'Товар', 'Selling Price']).agg(
+        {'остаток': 'sum', 'сумма': 'sum'}).reset_index()
+
+    xikmat_df.sort_values(by='сумма', ascending=False, inplace=True)
+
+    df.to_excel(output_file_path, index=False)
+    xikmat_df.to_excel(xikmat_file_path, index=False)
     formatter(df, output_file_path)
+    formatter(xikmat_df, xikmat_file_path)
