@@ -1,11 +1,6 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-BOT_USERNAME = os.getenv("BOT_USERNAME")
-
 import logging
 from typing import Dict
 
@@ -19,6 +14,11 @@ from telegram.ext import (
     filters,
     CallbackContext,
 )
+
+load_dotenv()
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+BOT_USERNAME = os.getenv("BOT_USERNAME")
 
 # Enable logging
 logging.basicConfig(
@@ -95,7 +95,7 @@ markup_photo = ReplyKeyboardMarkup(reply_keyboard_photo, one_time_keyboard=True)
 
 
 # Implement a new function to handle the received selfie photo
-async def received_photo(update: Update, context: CallbackContext, ADDITIONAL_INFO=None) -> int:
+async def received_photo(update: Update, context: CallbackContext) -> int:
     # Get the photo information sent by the user
     photo = update.message.photo[-1]  # Assuming the last photo is the largest
     photo_id = photo.file_id
