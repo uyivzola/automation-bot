@@ -74,4 +74,4 @@ def formatter(df, output_file_path):
     # Calculate and print the elapsed time
     elapsed_time = round(end_time - start_time, 2)
 
-    print(f"Formatting took: {elapsed_time} seconds.\n Love you <3. Have a nice day, babe 💋❤️")
+    print(f"Formatting took: {elapsed_time} seconds.\n")
