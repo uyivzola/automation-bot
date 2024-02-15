@@ -9,7 +9,7 @@ from reports.formatter import formatter
 
 
 def monthly_generator():
-    ##################### LOADING IMPORTANT DATA ######################
+    ############## LOADING IMPORTANT DATA ######################
     print('Started running monthly generator')
     # Load environment variables from the .env file
 
@@ -23,7 +23,7 @@ def monthly_generator():
     aksiya_df = pd.read_excel(promotion_path, sheet_name='Aksiya')
     paket_df = pd.read_excel(promotion_path, sheet_name='Paket')
     types_df = pd.read_excel(promotion_path, sheet_name='TYPES')
-    ##################### ACCESS ENV VARIABLES ######################
+    ############# ACCESS ENV VARIABLES ######################
 
     db_server = os.getenv("DB_SERVER")
     db_database = os.getenv("DB_DATABASE_ASKGLOBAL")
@@ -32,7 +32,7 @@ def monthly_generator():
     db_port = os.getenv("DB_PORT")
     db_driver_name = os.getenv("DB_DRIVER_NAME")
 
-    ##################### PROCEDURE NAME ######################
+    ####### PROCEDURE NAME ######################
     procedure_name = os.getenv("MONTHLY")  # THIS IS HOURLY DATA GATHERING
 
     # Set default values for date_begin and date_end if not provided
@@ -40,7 +40,7 @@ def monthly_generator():
     date_end = datetime(2024, 3, 31).strftime('%Y%m%d')
     CURRENT_MONTH = 2
     CURRENT_YEAR = 2024
-    ##################### CONNECTION STRING AND SQL QUERY ######################
+    ##### CONNECTION STRING AND SQL QUERY ######################
     # Construct the connection string
     conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
     engine = create_engine(conn_str)
@@ -54,10 +54,10 @@ def monthly_generator():
         @DataEnd = @DateEnd;
     """
 
-    #####################  EXECUTION  ######################
+    ########  EXECUTION  ######################
     df = pd.read_sql_query(sql_query, engine, params=(date_begin, date_end))
 
-    ##################### BASIC FILTER ######################
+    ######## BASIC FILTER ######################
     df['DataEntered'] = pd.to_datetime(df['DataEntered'])
     df = df[(df['DataEntered'].dt.year >= CURRENT_YEAR) & df['DocName'].isin(
         ['Оптовая реализация', 'Финансовая скидка', 'Возврат товара от покупателя'])]
