@@ -2,15 +2,126 @@ import os
 import time
 from datetime import datetime, timedelta  # For working with dates
 
+import matplotlib.pyplot as plt
 import pandas as pd  # For working with DataFrames
+import seaborn as sns
+from PIL import Image
 from dotenv import load_dotenv
+from matplotlib.ticker import FuncFormatter
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, PatternFill, Border, Side, Alignment
 from openpyxl.utils import get_column_letter
 from sqlalchemy import create_engine
 
-from reports.google_sheets import write_df_to_google_sheet, upload_to_google_sheet
+logo_path = 'reports/trash_media/logo.png'
+logo = Image.open(logo_path)
+size = 0.4
+# Resize the logo to 43% of its original size
+resized_width = int(logo.width * size)
+resized_height = int(logo.height * size)
+logo = logo.resize((resized_width, resized_height))
 
+
+# Function to format large numbers
+def format_large_numbers(value, pos):
+    if value >= 1e9:  # If the value is in billions
+        return f'{value / 1e9:.1f}B'
+    elif value >= 1e6:  # If the value is in millions
+        return f'{value / 1e6:.1f}M'
+    elif value >= 1e3:  # If the value is in thousands
+        return f'{value / 1e3:.1f}K'
+    else:  # For values less than 1000
+        return str(int(value))
+
+
+# Function to abbreviate or truncate the Good names
+def abbreviate_good_name(name, max_words=3):
+    words = name.split()
+    if len(words) <= max_words:
+        return name
+    else:
+        return ' '.join(words[:max_words]) + '...'
+
+def create_work_sheet(workbook, type_value, pivot_table, i):
+    # Create a new sheet with the type name
+    worksheet = workbook.create_sheet(title=str(type_value))
+    colors_for_sheet = ['FFC4C4', 'F3B95F', 'EAFFD0']
+
+    worksheet.sheet_properties.tabColor = colors_for_sheet[i - 1]
+    # Create a new named style for the header
+    header_style = NamedStyle(name=f'header_style_{i}',
+                              fill=PatternFill(start_color=colors_for_sheet[i - 1],
+                                               end_color=colors_for_sheet[i - 1], fill_type='solid'))
+
+    # Add pivot table to the sheet
+    for row_idx, (index, values) in enumerate(pivot_table.iterrows(), start=2):
+        worksheet.cell(row=row_idx, column=1, value=index)
+
+        # Iterate through the values and add them to the respective columns
+        for col_idx, (col, value) in enumerate(values.items(), start=2):
+            worksheet.cell(row=row_idx, column=col_idx, value=value)
+
+    # Add headers for the pivot table
+    for col_idx, col_name in enumerate(pivot_table.columns, start=2):
+        worksheet.cell(row=1, column=col_idx, value=col_name)
+
+    # Apply the header style to the first row
+    for cell in worksheet[1]:
+        cell.style = header_style
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    # 2. Autofit all columns
+    for column in worksheet.columns:
+        max_length = 0
+        column = [cell for cell in column]
+        for cell in column:
+            try:
+                value = str(cell.value)
+                if len(value) > max_length:
+                    max_length = len(value)
+            except:
+                pass
+        adjusted_width = (max_length + 1.5)
+        column_letter = get_column_letter(column[0].column)
+        worksheet.column_dimensions[column_letter].width = adjusted_width
+
+    # 3. Format columns with thousands separators
+    number_format = NamedStyle(name=f'number_format_{i}', number_format='### ### ### ##0')
+
+    # Specify the columns to format based on float64 datatype
+    float64_columns = pivot_table.select_dtypes(include=['float64']).columns
+
+    for col in float64_columns:
+        col_index = pivot_table.columns.get_loc(col) + 2  # 1-based index, starting from column 2
+        col_letter = get_column_letter(col_index)
+
+        for cell in worksheet[col_letter][1:]:  # Start from the second row assuming the first row is headers
+            try:
+                formatted_value = "{:,.2f}".format(float(cell.value))
+                cell.value = float(cell.value)
+                cell.style = number_format
+            except (ValueError, TypeError) as error:
+                print(error)
+
+    # Apply background color to all cells in the TOTAL (2nd) column
+    for row in worksheet.iter_rows(min_row=1, max_row=16, min_col=1,
+                                   max_col=3):
+        for cell in row:
+            cell.fill = PatternFill(start_color=colors_for_sheet[i - 1], end_color=colors_for_sheet[i - 1],
+                                    fill_type='solid')
+
+    # Add borders to all cells with data
+    for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1,
+                                   max_col=worksheet.max_column):
+        for cell in row:
+            cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
+                                 bottom=Side(style='thin'))
+
+def save_workbook(workbook, output_file_path):
+    try:
+        workbook.save(output_file_path)
+    except Exception as e:
+        print(f"Error saving workbook: {e}")
 
 def top_product_sold_generator():
     ##################### LOADING IMPORTANT DATA ######################
@@ -86,6 +197,49 @@ def top_product_sold_generator():
     client_fav_products(df=df)
 
 
+def create_bar_plot(df, output_file_path, type_value, title, x_column, y_column):
+
+    print(f'Plotting {title}')
+    # HOW MANY
+    top_rows = 20
+    df = df.head(top_rows).copy()
+    relevant_columns = df.columns[3:]
+
+    df[y_column] = df[y_column].apply(lambda x: abbreviate_good_name(x, max_words=3))
+
+    pastel_palette = sns.color_palette("tab20b")
+    if type_value == 'ROZ':
+        pastel_palette = sns.color_palette("tab20b")
+    if type_value == 'Сеть':
+        pastel_palette = sns.color_palette("tab20c")
+    if type_value == 'Опт':
+        pastel_palette = sns.color_palette("tab20")
+
+    output_picture_path = f'reports/trash_media/Top_20_Goods_{output_file_path.split("_")[1]}_{type_value}.png'
+
+    # Create a new figure
+    fig, ax = plt.subplots(figsize=(18, 10))
+    # Plotting horizontal bars using Seaborn
+    bars = sns.barplot(x=x_column, y=y_column, data=df, ax=ax,
+                       errorbar=None, hue=y_column,
+                       palette=pastel_palette)
+
+    # Adding labels and title
+    ax.set_xlabel(f'{x_column}')
+    ax.set_ylabel(f'{y_column}')
+    ax.set_title(f'{title} : {type_value}')
+
+    # Annotating each bar with its value
+    for bar, value in zip(bars.patches, df[x_column]):
+        ax.text(bar.get_width()+0.005 * bar.get_width(), bar.get_y() + bar.get_height() / 2, format_large_numbers(value, None), va='center')
+
+    # Format x-axis labels using the formatter function
+    ax.xaxis.set_major_formatter(FuncFormatter(format_large_numbers))
+    fig.figimage(logo, xo=1051.7, yo=65, alpha=0.5)  # Adjust xo, yo, and alpha as needed
+    plt.savefig(output_picture_path, bbox_inches='tight')
+    plt.close()
+
+
 def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
     print("Creating TOP REVENUE PRODUCTS LIST🔝")
     # Record the start time
@@ -95,28 +249,25 @@ def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
     workbook = Workbook()
     default_sheet = workbook.active
     workbook.remove(default_sheet)
+    # Set Seaborn palette
+    pastel_palette = sns.color_palette("tab20b")
 
     # Iterate over unique types in the dataframe
     for i, type_value in enumerate(sorted(df['TYPE'].unique()), start=1):
 
         # Filter dataframe for the current type
         type_df = df[df['TYPE'] == type_value]
-        print(f"Processing sheet: {type_value}, DataFrame shape: {type_df.shape}")
-
         # Assuming df is the DataFrame obtained from the SQL query
         # result_df = type_df[['Good', 'TotalAmount', 'ClientMan', 'RegionType']]
         result_df = type_df.copy()
-        print(f"Result DataFrame shape: {result_df.shape}")
 
         # Group by Good and Region, then sum the TotalAmount
         grouped_df = result_df.groupby(['Good', 'RegionType', 'ClientMan'], observed=False).agg(
             {'TotalAmount': 'sum'}).reset_index()
-        print(f"Grouped DataFrame shape: {grouped_df.shape}")
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, values='TotalAmount', index=['Good'], columns=['RegionType'],
                                      aggfunc='sum', fill_value=0)
-        print(f"Pivot Table shape: {pivot_table.shape}")
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')
@@ -137,90 +288,19 @@ def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
         pivot_table.index.name = '#'
         print(f"Sheet {i} name: {type_value}")
 
-        # Create a new sheet with the type name
-        worksheet = workbook.create_sheet(title=str(type_value))
-        colors_for_sheet = ['FFC4C4', 'F3B95F', 'EAFFD0']
+        # PLOTTING THE BARS
+        create_bar_plot(df=pivot_table,
+                        output_file_path=output_file_path,
+                        title='20 TOP REVENUE PRODUCTS',
+                        type_value=type_value,
+                        x_column='TOTAL',
+                        y_column='Good',
+                        # hue_column='RegionType'
+                        )
+        create_work_sheet(workbook=workbook, type_value=type_value, pivot_table=pivot_table, i=i)
+    save_workbook(workbook=workbook, output_file_path=output_file_path)
+    print("Done!")
 
-        worksheet.sheet_properties.tabColor = colors_for_sheet[i - 1]
-        # Create a new named style for the header
-        header_style = NamedStyle(name=f'header_style_{i}',
-                                  fill=PatternFill(start_color=colors_for_sheet[i - 1],
-                                                   end_color=colors_for_sheet[i - 1], fill_type='solid'))
-
-        # Add pivot table to the sheet
-        for row_idx, (index, values) in enumerate(pivot_table.iterrows(), start=2):
-            worksheet.cell(row=row_idx, column=1, value=index)
-
-            # Iterate through the values and add them to the respective columns
-            for col_idx, (col, value) in enumerate(values.items(), start=2):
-                worksheet.cell(row=row_idx, column=col_idx, value=value)
-
-        # Add headers for the pivot table
-        for col_idx, col_name in enumerate(pivot_table.columns, start=2):
-            worksheet.cell(row=1, column=col_idx, value=col_name)
-
-        # Apply the header style to the first row
-        for cell in worksheet[1]:
-            cell.style = header_style
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-
-        # 2. Autofit all columns
-        for column in worksheet.columns:
-            max_length = 0
-            column = [cell for cell in column]
-            for cell in column:
-                try:
-                    value = str(cell.value)
-                    if len(value) > max_length:
-                        max_length = len(value)
-                except:
-                    pass
-            adjusted_width = (max_length + 1.5)
-            column_letter = get_column_letter(column[0].column)
-            worksheet.column_dimensions[column_letter].width = adjusted_width
-
-        # 3. Format columns with thousands separators
-        number_format = NamedStyle(name=f'number_format_{i}', number_format='### ### ### ##0')
-
-        # Specify the columns to format based on float64 datatype
-        float64_columns = pivot_table.select_dtypes(include=['float64']).columns
-
-        for col in float64_columns:
-            col_index = pivot_table.columns.get_loc(col) + 2  # 1-based index, starting from column 2
-            col_letter = get_column_letter(col_index)
-
-            for cell in worksheet[col_letter][1:]:  # Start from the second row assuming the first row is headers
-                try:
-                    formatted_value = "{:,.2f}".format(float(cell.value))
-                    cell.value = float(cell.value)
-                    cell.style = number_format
-                except (ValueError, TypeError) as error:
-                    print(error)
-
-        # Apply background color to all cells in the TOTAL (2nd) column
-        for row in worksheet.iter_rows(min_row=1, max_row=16, min_col=1,
-                                       max_col=3):
-            for cell in row:
-                cell.fill = PatternFill(start_color=colors_for_sheet[i - 1], end_color=colors_for_sheet[i - 1],
-                                        fill_type='solid')
-
-        # Add borders to all cells with data
-        for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1,
-                                       max_col=worksheet.max_column):
-            for cell in row:
-                cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
-                                     bottom=Side(style='thin'))
-
-    try:
-        # Save the workbook
-        workbook.save(output_file_path)
-        end_time = time.time()
-
-        # Calculate and print the elapsed time
-        elapsed_time = round(end_time - start_time, 2)
-        print(f"Process took: {elapsed_time} seconds.\n Love you <3. Have a nice day, babe 💋❤️")
-    except Exception as e:
-        print(f"Error saving workbook: {e}")
 
 
 def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
@@ -233,25 +313,25 @@ def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
     default_sheet = workbook.active
     workbook.remove(default_sheet)
 
+    # Set Seaborn palette
+    pastel_palette = sns.color_palette("tab20")
+
     # Iterate over unique types in the dataframe
     for i, type_value in enumerate(sorted(df['TYPE'].unique()), start=1):
 
         # Filter dataframe for the current type
         type_df = df[df['TYPE'] == type_value]
-        print(f"Processing sheet: {type_value}, DataFrame shape: {type_df.shape}")
+
 
         # Assuming df is the DataFrame obtained from the SQL query
         result_df = type_df.copy()
-        print(f"Result DataFrame shape: {result_df.shape}")
 
         # Group by Good and Region, then count the unique 'inn'
         grouped_df = result_df.groupby(['Good', 'RegionType'], observed=False).agg({'inn': 'nunique'}).reset_index()
-        print(f"Grouped DataFrame shape: {grouped_df.shape}")
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, index='Good', columns='RegionType', values='inn', aggfunc='sum',
                                      fill_value=0)
-        print(f"Pivot Table shape: {pivot_table.shape}")
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')
@@ -273,96 +353,18 @@ def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
         pivot_table.index.name = '#'
         print(f"Sheet {i} name: {type_value}")
 
-        # Create a new sheet with the type name
-        worksheet = workbook.create_sheet(title=str(type_value))
-        colors_for_sheet = ['FFC4C4', 'F3B95F', 'EAFFD0']
+        create_bar_plot(df=pivot_table,
+                        output_file_path=output_file_path,
+                        title='20 TOP CLIENTS FAVORITE PRODUCTS',
+                        type_value=type_value,
+                        x_column='TOTAL CLIENTS',
+                        y_column='Good',
+                        # hue_column='RegionType'
+                        )
+        create_work_sheet(workbook=workbook, type_value=type_value, pivot_table=pivot_table, i=i)
 
-        worksheet.sheet_properties.tabColor = colors_for_sheet[i - 1]
-        # Create a new named style for the header
-        header_style = NamedStyle(name=f'header_style_{i}',
-                                  fill=PatternFill(start_color=colors_for_sheet[i - 1],
-                                                   end_color=colors_for_sheet[i - 1], fill_type='solid'))
-
-        # Add pivot table to the sheet
-        for row_idx, (index, values) in enumerate(pivot_table.iterrows(), start=2):
-            worksheet.cell(row=row_idx, column=1, value=index)
-
-            # Iterate through the values and add them to the respective columns
-            for col_idx, (col, value) in enumerate(values.items(), start=2):
-                worksheet.cell(row=row_idx, column=col_idx, value=value)
-        #
-        # Add pivot table to the sheet
-        # for row_idx, values in enumerate(pivot_table.values, start=2):
-        #     # Iterate through the values and add them to the respective columns
-        #     for col_idx, value in enumerate(values, start=1):  # Start from 1 to skip the index column
-        #         worksheet.cell(row=row_idx, column=col_idx, value=value)
-
-        # Add headers for the pivot table
-        for col_idx, col_name in enumerate(pivot_table.columns, start=2):  # Start from 1 to skip the index column
-            worksheet.cell(row=1, column=col_idx, value=col_name)
-
-        # Apply the header style to the first row
-        for cell in worksheet[1]:
-            cell.style = header_style
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-
-        # 2. Autofit all columns
-        for column in worksheet.columns:
-            max_length = 0
-            column = [cell for cell in column]
-            for cell in column:
-                try:
-                    value = str(cell.value)
-                    if len(value) > max_length:
-                        max_length = len(value)
-                except:
-                    pass
-            adjusted_width = (max_length + 1.8)
-            column_letter = get_column_letter(column[0].column)
-            worksheet.column_dimensions[column_letter].width = adjusted_width
-
-        # 3. Format columns with thousands separators
-        number_format = NamedStyle(name=f'number_format_{i}', number_format='### ### ### ##0')
-
-        # Specify the columns to format based on float64 datatype
-        float64_columns = pivot_table.select_dtypes(include=['float64']).columns
-
-        for col in float64_columns:
-            col_index = pivot_table.columns.get_loc(col) + 2  # 1-based index, starting from column 2
-            col_letter = get_column_letter(col_index)
-
-            for cell in worksheet[col_letter][1:]:  # Start from the second row assuming the first row is headers
-                try:
-                    formatted_value = "{:,.2f}".format(float(cell.value))
-                    cell.value = float(cell.value)
-                    cell.style = number_format
-                except (ValueError, TypeError) as error:
-                    print(error)
-
-        # Apply background color to all cells in the TOTAL (2nd) column
-        for row in worksheet.iter_rows(min_row=1, max_row=26, min_col=1,
-                                       max_col=3):
-            for cell in row:
-                cell.fill = PatternFill(start_color=colors_for_sheet[i - 1], end_color=colors_for_sheet[i - 1],
-                                        fill_type='solid')
-
-        # Add borders to all cells with data
-        for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1, max_col=worksheet.max_column):
-            for cell in row:
-                cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
-                                     bottom=Side(style='thin'))
-
-    try:
-        # Save the workbook
-        workbook.save(output_file_path)
-        end_time = time.time()
-
-        # Calculate and print the elapsed time
-        elapsed_time = round(end_time - start_time, 2)
-        print(f"Process took: {elapsed_time} seconds.\n Love you <3. Have a nice day, babe 💋❤️")
-    except Exception as e:
-        print(f"Error saving workbook: {e}")
-
+    save_workbook(workbook=workbook, output_file_path=output_file_path)
+    print("Done!")
 
 def high_volume_products(df, output_file_path='HIGH_VOLUME_PRODUCTS.xlsx'):
     print("Creating High Volume and Exporting🎨....")
@@ -373,26 +375,23 @@ def high_volume_products(df, output_file_path='HIGH_VOLUME_PRODUCTS.xlsx'):
     workbook = Workbook()
     default_sheet = workbook.active
     workbook.remove(default_sheet)
+    pastel_palette = sns.color_palette("tab20c")
 
     # Iterate over unique types in the dataframe
     for i, type_value in enumerate(sorted(df['TYPE'].unique()), start=1):
 
         # Filter dataframe for the current type
         type_df = df[df['TYPE'] == type_value]
-        print(f"Processing sheet: {type_value}, DataFrame shape: {type_df.shape}")
 
         # Assuming df is the DataFrame obtained from the SQL query
         result_df = type_df.copy()
-        print(f"Result DataFrame shape: {result_df.shape}")
 
         # Group by Good and Region, then count the unique 'inn'
         grouped_df = result_df.groupby(['Good', 'RegionType'], observed=False).agg({'Quantity': 'sum'}).reset_index()
-        print(f"Grouped DataFrame shape: {grouped_df.shape}")
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, index='Good', columns='RegionType', values='Quantity', aggfunc='sum',
                                      fill_value=0)
-        print(f"Pivot Table shape: {pivot_table.shape}")
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')
@@ -414,92 +413,15 @@ def high_volume_products(df, output_file_path='HIGH_VOLUME_PRODUCTS.xlsx'):
         pivot_table.index.name = '#'
         print(f"Sheet {i} name: {type_value}")
 
-        # Create a new sheet with the type name
-        worksheet = workbook.create_sheet(title=str(type_value))
-        colors_for_sheet = ['FFC4C4', 'F3B95F', 'EAFFD0']
+        create_bar_plot(df=pivot_table,
+                        output_file_path=output_file_path,
+                        title='20 TOP HIGH VOLUME PRODUCTS',
+                        type_value=type_value,
+                        x_column='TOTAL QUANTITY',
+                        y_column='Good',
+                        # hue_column='RegionType'
+                        )
+        create_work_sheet(workbook=workbook, type_value=type_value, pivot_table=pivot_table, i=i)
 
-        worksheet.sheet_properties.tabColor = colors_for_sheet[i - 1]
-        # Create a new named style for the header
-        header_style = NamedStyle(name=f'header_style_{i}',
-                                  fill=PatternFill(start_color=colors_for_sheet[i - 1],
-                                                   end_color=colors_for_sheet[i - 1], fill_type='solid'))
-
-        # Add pivot table to the sheet
-        for row_idx, (index, values) in enumerate(pivot_table.iterrows(), start=2):
-            worksheet.cell(row=row_idx, column=1, value=index)
-
-            # Iterate through the values and add them to the respective columns
-            for col_idx, (col, value) in enumerate(values.items(), start=2):
-                worksheet.cell(row=row_idx, column=col_idx, value=value)
-        #
-        # Add pivot table to the sheet
-        # for row_idx, values in enumerate(pivot_table.values, start=2):
-        #     # Iterate through the values and add them to the respective columns
-        #     for col_idx, value in enumerate(values, start=1):  # Start from 1 to skip the index column
-        #         worksheet.cell(row=row_idx, column=col_idx, value=value)
-
-        # Add headers for the pivot table
-        for col_idx, col_name in enumerate(pivot_table.columns, start=2):  # Start from 1 to skip the index column
-            worksheet.cell(row=1, column=col_idx, value=col_name)
-
-        # Apply the header style to the first row
-        for cell in worksheet[1]:
-            cell.style = header_style
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-
-        # 2. Autofit all columns
-        for column in worksheet.columns:
-            max_length = 0
-            column = [cell for cell in column]
-            for cell in column:
-                try:
-                    value = str(cell.value)
-                    if len(value) > max_length:
-                        max_length = len(value)
-                except:
-                    pass
-            adjusted_width = (max_length + 1.8)
-            column_letter = get_column_letter(column[0].column)
-            worksheet.column_dimensions[column_letter].width = adjusted_width
-
-        # 3. Format columns with thousands separators
-        number_format = NamedStyle(name=f'number_format_{i}', number_format='### ### ### ##0')
-
-        # Specify the columns to format based on float64 datatype
-        float64_columns = pivot_table.select_dtypes(include=['float64']).columns
-
-        for col in float64_columns:
-            col_index = pivot_table.columns.get_loc(col) + 2  # 1-based index, starting from column 2
-            col_letter = get_column_letter(col_index)
-
-            for cell in worksheet[col_letter][1:]:  # Start from the second row assuming the first row is headers
-                try:
-                    formatted_value = "{:,.2f}".format(float(cell.value))
-                    cell.value = float(cell.value)
-                    cell.style = number_format
-                except (ValueError, TypeError) as error:
-                    print(error)
-
-        # Apply background color to all cells in the TOTAL (2nd) column
-        for row in worksheet.iter_rows(min_row=1, max_row=26, min_col=1,
-                                       max_col=3):
-            for cell in row:
-                cell.fill = PatternFill(start_color=colors_for_sheet[i - 1], end_color=colors_for_sheet[i - 1],
-                                        fill_type='solid')
-
-        # Add borders to all cells with data
-        for row in worksheet.iter_rows(min_row=1, max_row=worksheet.max_row, min_col=1, max_col=worksheet.max_column):
-            for cell in row:
-                cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
-                                     bottom=Side(style='thin'))
-
-    try:
-        # Save the workbook
-        workbook.save(output_file_path)
-        end_time = time.time()
-
-        # Calculate and print the elapsed time
-        elapsed_time = round(end_time - start_time, 2)
-        print(f"Process took: {elapsed_time} seconds.\n")
-    except Exception as e:
-        print(f"Error saving workbook: {e}")
+    save_workbook(workbook=workbook, output_file_path=output_file_path)
+    print("Done!")
