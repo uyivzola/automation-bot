@@ -42,6 +42,7 @@ def abbreviate_good_name(name, max_words=3):
     else:
         return ' '.join(words[:max_words]) + '...'
 
+
 def create_work_sheet(workbook, type_value, pivot_table, i):
     # Create a new sheet with the type name
     worksheet = workbook.create_sheet(title=str(type_value))
@@ -117,11 +118,13 @@ def create_work_sheet(workbook, type_value, pivot_table, i):
             cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
                                  bottom=Side(style='thin'))
 
+
 def save_workbook(workbook, output_file_path):
     try:
         workbook.save(output_file_path)
     except Exception as e:
         print(f"Error saving workbook: {e}")
+
 
 def top_product_sold_generator():
     ##################### LOADING IMPORTANT DATA ######################
@@ -184,7 +187,7 @@ def top_product_sold_generator():
 
     categorical_columns = ['DocumentType', 'Good', 'Manufacturer', 'inn', 'ClientName', 'SalesManager', 'ClientMan',
                            'PaymentTerm', 'Region', 'RegionType', 'TYPE']
-
+    df = df[~(df['SalesManager'] == 'Бочкарева Альвина')]
     df[categorical_columns] = df[categorical_columns].astype('category')
     # Assuming df is your DataFrame
     columns_to_drop = [col for col in df.columns if col.endswith('_temp')]
@@ -198,7 +201,6 @@ def top_product_sold_generator():
 
 
 def create_bar_plot(df, output_file_path, type_value, title, x_column, y_column):
-
     print(f'Plotting {title}')
     # HOW MANY
     top_rows = 20
@@ -231,7 +233,8 @@ def create_bar_plot(df, output_file_path, type_value, title, x_column, y_column)
 
     # Annotating each bar with its value
     for bar, value in zip(bars.patches, df[x_column]):
-        ax.text(bar.get_width()+0.005 * bar.get_width(), bar.get_y() + bar.get_height() / 2, format_large_numbers(value, None), va='center')
+        ax.text(bar.get_width() + 0.005 * bar.get_width(), bar.get_y() + bar.get_height() / 2,
+                format_large_numbers(value, None), va='center')
 
     # Format x-axis labels using the formatter function
     ax.xaxis.set_major_formatter(FuncFormatter(format_large_numbers))
@@ -254,7 +257,6 @@ def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
 
     # Iterate over unique types in the dataframe
     for i, type_value in enumerate(sorted(df['TYPE'].unique()), start=1):
-
         # Filter dataframe for the current type
         type_df = df[df['TYPE'] == type_value]
         # Assuming df is the DataFrame obtained from the SQL query
@@ -302,7 +304,6 @@ def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
     print("Done!")
 
 
-
 def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
     print("Creating Pivot Tables and Exporting🎨....")
     # Record the start time
@@ -318,10 +319,8 @@ def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
 
     # Iterate over unique types in the dataframe
     for i, type_value in enumerate(sorted(df['TYPE'].unique()), start=1):
-
         # Filter dataframe for the current type
         type_df = df[df['TYPE'] == type_value]
-
 
         # Assuming df is the DataFrame obtained from the SQL query
         result_df = type_df.copy()
@@ -366,6 +365,7 @@ def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
     save_workbook(workbook=workbook, output_file_path=output_file_path)
     print("Done!")
 
+
 def high_volume_products(df, output_file_path='HIGH_VOLUME_PRODUCTS.xlsx'):
     print("Creating High Volume and Exporting🎨....")
     # Record the start time
@@ -379,7 +379,6 @@ def high_volume_products(df, output_file_path='HIGH_VOLUME_PRODUCTS.xlsx'):
 
     # Iterate over unique types in the dataframe
     for i, type_value in enumerate(sorted(df['TYPE'].unique()), start=1):
-
         # Filter dataframe for the current type
         type_df = df[df['TYPE'] == type_value]
 
