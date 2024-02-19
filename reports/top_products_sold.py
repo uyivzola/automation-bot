@@ -13,7 +13,7 @@ from openpyxl.styles import NamedStyle, PatternFill, Border, Side, Alignment
 from openpyxl.utils import get_column_letter
 from sqlalchemy import create_engine
 
-logo_path = 'reports/trash_media/logo.png'
+logo_path = r'D:\Projects\BOT\reports\trash_media\logo.png'
 logo = Image.open(logo_path)
 size = 0.4
 # Resize the logo to 43% of its original size
@@ -125,81 +125,6 @@ def save_workbook(workbook, output_file_path):
     except Exception as e:
         print(f"Error saving workbook: {e}")
 
-
-def top_product_sold_generator():
-    ##################### LOADING IMPORTANT DATA ######################
-    # Load environment variables from the .env file
-    env_file_path = 'D:/Projects/.env'
-    load_dotenv(env_file_path)
-    # Giving output file name
-    # Load data from different sheets in 'promotion.xlsx' into DataFrames
-    promotion_path = r'D:\Projects\promotion.xlsx'
-    region_df = pd.read_excel(promotion_path, sheet_name='Region')
-    types_df = pd.read_excel(promotion_path, sheet_name='TYPES')
-    ##################### ACCESS ENV VARIABLES ######################
-    db_server = os.getenv("DB_SERVER")
-    db_database = os.getenv("DB_DATABASE_SERGELI")
-    db_user = os.getenv("DB_USER")
-    db_password = os.getenv("DB_PASSWORD")
-    db_port = os.getenv("DB_PORT")
-    db_driver_name = os.getenv("DB_DRIVER_NAME")
-    ##################### PROCEDURE NAME ######################
-    procedure_name = 'zAdmReportDFS_short'  # THIS IS HOURLY DATA GATHERING
-    today_date = datetime.now().strftime('%d/%m/%Y')
-    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%d/%m/%Y')
-
-    ##################### CONNECTION STRING AND SQL QUERY ######################
-    # Construct the connection string
-    conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
-    engine = create_engine(conn_str)
-
-    sql_query = f"""
-        DECLARE @DateBegin DATE = ?;
-        DECLARE @DateEnd DATE = ?;
-    
-        EXEC {procedure_name}
-            @DateBegin = @DateBegin,
-            @DateEnd = @DateBegin;
-    """
-
-    #####################  EXECUTION  ######################
-    df = pd.read_sql_query(sql_query, engine, params=(today_date, tomorrow_date))
-    df.columns = ['DocumentType', 'Invoice Number', 'Goodid', 'Good', 'Manufacturer', 'inn', 'ClientName',
-                  'SalesManager', 'ClientMan', 'PaymentTerm', 'BasePrice', 'SellingPrice', 'Quantity', 'DateEntered',
-                  'BaseAmount', 'TotalAmount']
-
-    ##################### BASIC FILTER ######################
-    df = df[df['DocumentType'].isin(['Оптовая реализация', 'Финансовая скидка'])]
-    df['DateEntered'] = pd.to_datetime(df['DateEntered'])
-    # Filter the DataFrame for today's date
-    today_date = datetime.today().strftime("%Y-%m-%d")
-    df = df[(df['DateEntered'].dt.date == pd.to_datetime(today_date).date()) & df['SalesManager'] != '']
-
-    df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
-
-    df['inn_temp'] = pd.to_numeric(df['inn'], errors='coerce')
-    types_df['INN_temp'] = pd.to_numeric(types_df['INN'], errors='coerce')
-    df = pd.merge(df, types_df[['INN_temp', 'TYPE', 'RegionType']], left_on='inn_temp', right_on='INN_temp', how='left')
-    df['TYPE'] = df['TYPE'].fillna('ROZ')
-    df.loc[df['TYPE'] == 'ROZ', 'RegionType'] = df['Region']
-
-    df['OXVAT'] = df['inn'].map(df['inn'].value_counts())
-
-    categorical_columns = ['DocumentType', 'Good', 'Manufacturer', 'inn', 'ClientName', 'SalesManager', 'ClientMan',
-                           'PaymentTerm', 'Region', 'RegionType', 'TYPE']
-    df = df[~(df['SalesManager'] == 'Бочкарева Альвина')]
-    df[categorical_columns] = df[categorical_columns].astype('category')
-    # Assuming df is your DataFrame
-    columns_to_drop = [col for col in df.columns if col.endswith('_temp')]
-
-    # Drop the identified columns
-    df.drop(columns=columns_to_drop, inplace=True)
-
-    top_revenue_products(df=df)
-    high_volume_products(df=df)
-    client_fav_products(df=df)
-
-
 def create_bar_plot(df, output_file_path, type_value, title, x_column, y_column):
     print(f'Plotting {title}')
     # HOW MANY
@@ -241,7 +166,78 @@ def create_bar_plot(df, output_file_path, type_value, title, x_column, y_column)
     fig.figimage(logo, xo=1051.7, yo=65, alpha=0.5)  # Adjust xo, yo, and alpha as needed
     plt.savefig(output_picture_path, bbox_inches='tight')
     plt.close()
+def top_product_sold_generator():
+    ##################### LOADING IMPORTANT DATA ######################
+    # Load environment variables from the .env file
+    env_file_path = 'D:/Projects/.env'
+    load_dotenv(env_file_path)
+    # Giving output file name
+    # Load data from different sheets in 'promotion.xlsx' into DataFrames
+    promotion_path = r'D:\Projects\promotion.xlsx'
+    region_df = pd.read_excel(promotion_path, sheet_name='Region')
+    types_df = pd.read_excel(promotion_path, sheet_name='TYPES')
+    ##################### ACCESS ENV VARIABLES ######################
+    db_server = os.getenv("DB_SERVER")
+    db_database = os.getenv("DB_DATABASE_SERGELI")
+    db_user = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
+    db_port = os.getenv("DB_PORT")
+    db_driver_name = os.getenv("DB_DRIVER_NAME")
+    ##################### PROCEDURE NAME ######################
+    procedure_name = 'zAdmReportDFS_short'  # THIS IS HOURLY DATA GATHERING
+    today_date = datetime.now().strftime('%Y%m%d')
+    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y%m%d')
 
+    ##################### CONNECTION STRING AND SQL QUERY ######################
+    # Construct the connection string
+    conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
+    engine = create_engine(conn_str)
+
+    sql_query = f"""
+        DECLARE @DateBegin DATE = ?;
+        DECLARE @DateEnd DATE = ?;
+    
+        EXEC {procedure_name}
+            @DateBegin = @DateBegin,
+            @DateEnd = @DateBegin;
+    """
+
+    #####################  EXECUTION  ######################
+    df = pd.read_sql_query(sql_query, engine, params=(today_date, tomorrow_date))
+    df.columns = ['DocumentType', 'Invoice Number', 'Goodid', 'Good', 'Manufacturer', 'inn', 'ClientName',
+                  'SalesManager', 'ClientMan', 'PaymentTerm', 'BasePrice', 'SellingPrice', 'Quantity', 'DateEntered',
+                  'BaseAmount', 'TotalAmount']
+    ##################### BASIC FILTER ######################
+    df = df[df['DocumentType'].isin(['Оптовая реализация', 'Финансовая скидка'])]
+    df['DateEntered'] = pd.to_datetime(df['DateEntered'])
+    # Filter the DataFrame for today's date
+    today_date = datetime.today().strftime("%Y-%m-%d")
+    df = df[(df['DateEntered'].dt.date == pd.to_datetime(today_date).date()) & df['SalesManager'] != '']
+
+    df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
+
+    df['inn_temp'] = pd.to_numeric(df['inn'], errors='coerce')
+    types_df['INN_temp'] = pd.to_numeric(types_df['INN'], errors='coerce')
+    df = pd.merge(df, types_df[['INN_temp', 'TYPE', 'RegionType']], left_on='inn_temp', right_on='INN_temp', how='left')
+    df['TYPE'] = df['TYPE'].fillna('ROZ')
+    df.loc[df['TYPE'] == 'ROZ', 'RegionType'] = df['Region']
+
+    df['OXVAT'] = df['inn'].map(df['inn'].value_counts())
+
+    categorical_columns = ['DocumentType', 'Good', 'Manufacturer', 'inn', 'ClientName', 'SalesManager', 'ClientMan',
+                           'PaymentTerm', 'Region', 'RegionType', 'TYPE']
+    df = df[~(df['SalesManager'] == 'Бочкарева Альвина')]
+    df[categorical_columns] = df[categorical_columns].astype('category')
+    # Assuming df is your DataFrame
+    columns_to_drop = [col for col in df.columns if col.endswith('_temp')]
+
+    # Drop the identified columns
+    df.drop(columns=columns_to_drop, inplace=True)
+    print(f'Got data frame and its shape is {df.shape}')
+
+    top_revenue_products(df=df)
+    high_volume_products(df=df)
+    client_fav_products(df=df)
 
 def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
     print("Creating TOP REVENUE PRODUCTS LIST🔝")
@@ -424,3 +420,7 @@ def high_volume_products(df, output_file_path='HIGH_VOLUME_PRODUCTS.xlsx'):
 
     save_workbook(workbook=workbook, output_file_path=output_file_path)
     print("Done!")
+
+
+if __name__ == "__main__":
+    top_product_sold_generator()

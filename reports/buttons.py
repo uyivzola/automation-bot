@@ -133,7 +133,7 @@ async def top(update, context):
                 print(f'Sending {file}')
                 await context.bot.send_document(chat_id, document, reply_to_message_id=message_id)
 
-        await message.delete()  # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+        await message.delete()
 
     except Exception as e:
         # Handle exceptions and reply with an error message
