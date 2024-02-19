@@ -23,7 +23,7 @@ def limit_generator():
     today_date = datetime.now().strftime('%d %b')
     output_file_path = f'LIMIT - {today_date}.xlsx'
     # Load data from different sheets in 'promotion.xlsx' into DataFrames
-    promotion_path = 'D:\Projects\promotion.xlsx'
+    promotion_path = r'D:\Projects\promotion.xlsx'
     region_df = pd.read_excel(promotion_path, sheet_name='Region')
     # Access the environment variables
     db_server = os.getenv("DB_SERVER")

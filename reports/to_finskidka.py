@@ -14,7 +14,7 @@ def to_finskidka_generator():
     # Giving output file name
     output_file_path = 'TOandFinSkidka.xlsx'
     # Load data from different sheets in 'promotion.xlsx' into DataFrames
-    promotion_path = 'D:\Projects\promotion.xlsx'
+    promotion_path = r'D:\Projects\promotion.xlsx'
     region_df = pd.read_excel(promotion_path, sheet_name='Region')
     types_df = pd.read_excel(promotion_path, sheet_name='TYPES')
 

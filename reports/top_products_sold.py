@@ -133,7 +133,7 @@ def top_product_sold_generator():
     load_dotenv(env_file_path)
     # Giving output file name
     # Load data from different sheets in 'promotion.xlsx' into DataFrames
-    promotion_path = 'D:\Projects\promotion.xlsx'
+    promotion_path = r'D:\Projects\promotion.xlsx'
     region_df = pd.read_excel(promotion_path, sheet_name='Region')
     types_df = pd.read_excel(promotion_path, sheet_name='TYPES')
     ##################### ACCESS ENV VARIABLES ######################
@@ -180,7 +180,7 @@ def top_product_sold_generator():
     df['inn_temp'] = pd.to_numeric(df['inn'], errors='coerce')
     types_df['INN_temp'] = pd.to_numeric(types_df['INN'], errors='coerce')
     df = pd.merge(df, types_df[['INN_temp', 'TYPE', 'RegionType']], left_on='inn_temp', right_on='INN_temp', how='left')
-    df['TYPE'].fillna('ROZ', inplace=True)
+    df['TYPE'] = df['TYPE'].fillna('ROZ')
     df.loc[df['TYPE'] == 'ROZ', 'RegionType'] = df['Region']
 
     df['OXVAT'] = df['inn'].map(df['inn'].value_counts())
@@ -269,7 +269,7 @@ def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, values='TotalAmount', index=['Good'], columns=['RegionType'],
-                                     aggfunc='sum', fill_value=0)
+                                     aggfunc='sum', fill_value=0,observed=False)
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')
@@ -330,7 +330,7 @@ def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, index='Good', columns='RegionType', values='inn', aggfunc='sum',
-                                     fill_value=0)
+                                     fill_value=0,observed=False)
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')
@@ -390,7 +390,7 @@ def high_volume_products(df, output_file_path='HIGH_VOLUME_PRODUCTS.xlsx'):
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, index='Good', columns='RegionType', values='Quantity', aggfunc='sum',
-                                     fill_value=0)
+                                     fill_value=0, observed=False)
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')

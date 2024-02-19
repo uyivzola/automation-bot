@@ -24,7 +24,7 @@ def oxvat_generator():
     # Get today's date
     today_date = datetime.now().strftime('%d %b')
     output_file_path = f'NE OXVACHEN - {today_date}.xlsx'
-    promotion_path = "D:\Projects\promotion.xlsx"
+    promotion_path = r'D:\Projects\promotion.xlsx'
 
     # Load data from different sheets in 'promotion.xlsx' into DataFrames
     region_df = pd.read_excel(promotion_path, sheet_name='Region')
