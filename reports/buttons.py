@@ -30,7 +30,9 @@ async def chuck_norris_jokes(update, context):
             text = response_json["value"]
             # Print the extracted text VALUE
             print(text)
-            await message.edit_text(text)  # await update.message.delete()
+            bot_response = await message.edit_text(text)  # await update.message.delete()
+            await context.bot.pin_chat_message(chat_id=update.message.chat_id, message_id=bot_response.message_id)
+
 
         else:
             # Print an error message if the request was not successful
@@ -352,7 +354,7 @@ button_functions = {'LIMIT💸': limit,
                     '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
                     'HOURLY⏳': hourly,
                     '️Monthly  ⛏️️️': monthly,
-                    'FINSKIDKA📈': to_finskidka,
+                    # 'FINSKIDKA📈': to_finskidka,
                     'Jokes about Gulya😅': gulya_jokes,
                     '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
                     }
