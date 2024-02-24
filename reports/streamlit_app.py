@@ -13,7 +13,6 @@ from matplotlib.dates import DateFormatter
 import calendar
 import plotly.express as px
 
-
 ##################### LOADING IMPORTANT DATA ######################
 # Load environment variables from the .env file
 env_file_path = 'D:/Projects/.env'
@@ -60,9 +59,9 @@ EXEC bGoodSaleWithInfo
 
 
 @st.cache_data
-def run_query(start_date, end_date):
+def run_query(start_date, end_date) -> pd.DataFrame:
     # Execute the SQL query with provided dates
-    x=st.text('RUNNING')
+    x = st.text('RUNNING')
     print('Running...')
     df = pd.read_sql_query(sql_query.format(procedure_name=procedure_name), engine,
                            params=(start_date, end_date))
@@ -118,7 +117,7 @@ def run_query(start_date, end_date):
     return df
 
 
-def format_large_numbers(value, *pos):
+def format_large_numbers(value, *pos) -> str:
     if value >= 1e9:  # If the value is in billions
         return f'{value / 1e9:.1f}B'
     elif value >= 1e6:  # If the value is in millions
@@ -129,7 +128,7 @@ def format_large_numbers(value, *pos):
         return str(int(value))
 
 
-def abbreviate_good_name(name, max_words=3):
+def abbreviate_good_name(name, max_words=3)-> str:
     words = name.split()
     if len(words) <= max_words:
         return name
@@ -150,14 +149,14 @@ end_date = datetime.combine(end_date, datetime.max.time())
 
 
 @st.cache_data
-def calc_to_by_regions(df: pd.DataFrame, type_value: str):
+def calc_to_by_regions(df: pd.DataFrame, type_value: str) -> pd.DataFrame:
     st.text(type_value)
     result_df = df[df['TYPE'] == type_value]
     return result_df
 
 
 @st.cache_data
-def calc_daily_totals(df):
+def calc_daily_totals(df) -> pd.DataFrame:
     goods_totals = df.groupby('Good', observed=False)['OutKolich'].sum().reset_index()
     goods_totals = goods_totals[goods_totals['OutKolich'] >= 2500]
     top_goods = goods_totals.sort_values(by='OutKolich', ascending=False)
@@ -170,7 +169,6 @@ def calc_daily_totals(df):
     daily_total_df = daily_total_df[daily_total_df['OutKolich'] >= 20]
 
     return daily_total_df
-
 
 
 if st.button("Run Query"):

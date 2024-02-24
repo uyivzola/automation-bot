@@ -71,7 +71,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Handle the case where the button text doesn't match any function
         await update.message.reply_text(f"No function defined for button: {button_text}")
 
-
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bots token.
