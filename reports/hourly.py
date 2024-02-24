@@ -17,7 +17,7 @@ def hourly_generator():
     # Giving output file name
     output_file_path = 'HOURLY.xlsx'
     # Load data from different sheets in 'promotion.xlsx' into DataFrames
-    promotion_path = 'D:\Projects\promotion.xlsx'
+    promotion_path = r'D:\Projects\promotion.xlsx'
     region_df = pd.read_excel(promotion_path, sheet_name='Region')
     aksiya_df = pd.read_excel(promotion_path, sheet_name='Aksiya')
     paket_df = pd.read_excel(promotion_path, sheet_name='Paket')
