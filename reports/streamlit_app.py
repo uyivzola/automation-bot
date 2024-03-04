@@ -128,7 +128,7 @@ def format_large_numbers(value, *pos) -> str:
         return str(int(value))
 
 
-def abbreviate_good_name(name, max_words=3)-> str:
+def abbreviate_good_name(name, max_words=3) -> str:
     words = name.split()
     if len(words) <= max_words:
         return name
@@ -165,7 +165,7 @@ def calc_daily_totals(df) -> pd.DataFrame:
         ['Good', df['DataEntered'].dt.date],
         observed=False)[
         'OutKolich'].sum().reset_index()
-    daily_total_df = daily_total_df.sort_values(by='OutKolich', ascending=False)
+    # daily_total_df = daily_total_df.sort_values(by='OutKolich', ascending=False)
     daily_total_df = daily_total_df[daily_total_df['OutKolich'] >= 20]
 
     return daily_total_df
@@ -174,12 +174,23 @@ def calc_daily_totals(df) -> pd.DataFrame:
 if st.button("Run Query"):
     # Run the SQL query and display the DataFrame
     df = run_query(start_date, end_date)
+
     st.text('Whole DATAFRAME')
     st.dataframe(df)
+
+
 
     for type_value in ['ROZ']:
         frame = calc_to_by_regions(df, type_value)
         daily_totals = calc_daily_totals(frame)
+
+        default_product = daily_totals['Good'].iloc[3]
+        selected_product = st.selectbox("Select a product", daily_totals['Good'].unique(), index=0)
+        st.subheader(f"History for {selected_product}")
+
+        selected_product_df = daily_totals[daily_totals['Good'] == selected_product]
+        st.dataframe(selected_product_df)
+        sns.barplot(data=daily_totals[daily_totals['Good'] == selected_product], x='DataEntered', y='OutKolich')
 
         st.dataframe(daily_totals)
         for good in daily_totals['Good'].unique():

@@ -4,7 +4,6 @@ import random
 from datetime import datetime, timedelta
 
 import requests
-from reports.top import top_generator
 
 from reports.gulya_jokes import gulya_opa_jokes
 from reports.hourly import hourly_generator
@@ -12,6 +11,7 @@ from reports.limit import limit_generator
 from reports.montly import monthly_generator
 from reports.oxvat import oxvat_generator
 from reports.to_finskidka import to_finskidka_generator
+from reports.top import top_generator
 from reports.top_products_sold import top_product_sold_generator
 
 
@@ -133,8 +133,7 @@ async def top(update, context):
                 print(f'Sending {file}')
                 await context.bot.send_document(chat_id, document, reply_to_message_id=message_id)
 
-        await message.delete()
-        # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+        await message.delete()  # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
 
     except Exception as e:
         # Handle exceptions and reply with an error message
@@ -173,8 +172,7 @@ async def limit(update, context):
                                             reply_to_message_id=message_id)
 
         # Delete the preliminary message
-        await message.delete()
-        # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+        await message.delete()  # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
@@ -313,8 +311,7 @@ async def top_high_fav(update, context):
     top_files = {
         'TOP_REVENUE_PRODUCTS_SOLD.xlsx': 'Товары, приносящие наибольший доход, среди клиентов в различных регионах и типах на',
         'HIGH_VOLUME_PRODUCTS.xlsx': 'Товары с наибольшим объемом(колич) продаж среди клиентов в различных регионах и типах на',
-        'CLIENT_FAVORITE_PRODUCTS.xlsx': 'Товары, популярные среди клиентов в различных регионах и разных типов на'
-    }
+        'CLIENT_FAVORITE_PRODUCTS.xlsx': 'Товары, популярные среди клиентов в различных регионах и разных типов на'}
     message = await update.message.reply_text(
         f'Sizning so\'rovingiz bo\'yicha  \n *TOP REVENUE PRODUCTS SOLD\.xlsx* \n fayl tayyorlanmoqda😎 '
         'Iltimos kuting⌛⌛⌛ \(o\'rtacha 2 daqiqa\)', parse_mode='MarkdownV2', reply_to_message_id=message_id)
@@ -324,21 +321,18 @@ async def top_high_fav(update, context):
             top_product_sold_generator()
             # Open and send the document
             with open(file, 'rb') as document:
-                caption_text = (f"\n\n{file_desc}\n<b><u>{formatted_date}</u></b>\n\n\n"
-                                )
+                caption_text = (f"\n\n{file_desc}\n<b><u>{formatted_date}</u></b>\n\n\n")
 
-                main_file_message = await context.bot.send_document(chat_id, document,
-                                                caption=caption_text,
-                                                parse_mode='HTML',
-                                                reply_to_message_id=message_id)
+                main_file_message = await context.bot.send_document(chat_id, document, caption=caption_text,
+                                                                    parse_mode='HTML', reply_to_message_id=message_id)
 
                 for subtype in ['ROZ', 'Сеть']:
                     picture_file_path = f'reports/trash_media/Top_20_Goods_{file.split("_")[1]}_{subtype}.png'
                     with open(picture_file_path, 'rb') as picture:
                         if os.path.exists(picture_file_path):
                             await context.bot.send_photo(chat_id, photo=picture,
-                                                 caption=f'ТОП 20 {file_desc} - {subtype}',
-                                                 reply_to_message_id=main_file_message.message_id)
+                                                         caption=f'ТОП 20 {file_desc} - {subtype}',
+                                                         reply_to_message_id=main_file_message.message_id)
 
         await message.delete()
     except Exception as e:
@@ -348,13 +342,37 @@ async def top_high_fav(update, context):
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
-button_functions = {'LIMIT💸': limit,
-                    'OXVAT🙈': oxvat,
-                    'TOP OSTATOK🔄️': top,
-                    '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
-                    'HOURLY⏳': hourly,
-                    '️Monthly  ⛏️️️': monthly,
-                    # 'FINSKIDKA📈': to_finskidka,
-                    'Jokes about Gulya😅': gulya_jokes,
-                    '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
-                    }
+async def delete_xlsx_files(update, context) -> None:
+    # Get the chat ID and user ID for logging purposes
+    chat_id = update.message.chat_id
+    user_id = update.message.from_user.id
+
+    # Specify the directory where you want to delete '*.xlsx' files
+    directory_path = './'
+
+    try:
+        # Iterate through files in the directory and try to delete '*.xlsx' files
+        for filename in os.listdir(directory_path):
+            if filename.endswith(".xlsx"):
+                if filename:
+                    file_path = os.path.join(directory_path, filename)
+                    try:
+                        os.remove(file_path)
+                        await update.message.reply_text(f'{filename} has been deleted successfully!')
+                    except Exception as e:
+                        # Log any errors that may occur during the file deletion process
+                        error_message = f"Error deleting {filename}: {str(e)}"
+                        await context.bot.send_message(chat_id=chat_id, text=error_message)
+
+        # Notify the user about the completion of the deletion process
+        await update.message.reply_text('All files have been deleted successfully!')
+    except Exception as e:
+        # Log any errors that may occur during the file iteration process
+        error_message = f"Error iterating through files: {str(e)}"
+        await context.bot.send_message(chat_id=chat_id, text=error_message)
+
+
+button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
+                    'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,  # 'FINSKIDKA📈': to_finskidka,
+                    'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
+                    '🗑️ Clear Files': delete_xlsx_files}

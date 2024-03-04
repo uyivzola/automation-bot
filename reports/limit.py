@@ -58,6 +58,7 @@ def limit_generator():
     df = df[df['Свободный лимит'] > 200_000]
     df.sort_values(by=['Region', 'ClientMan'], inplace=True)
     df.rename(columns={'Region': 'Регион', 'ClientMan': "Ответственный Менеджер"}, inplace=True)
+    df.drop_duplicates(subset=['ИНН клиента'], inplace=True)
     end_time = time.time()
     df.to_excel(output_file_path, index=False)
     print(f"Data Preparation took: {round(end_time - start_time, 0)} seconds.")
