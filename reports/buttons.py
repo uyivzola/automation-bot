@@ -351,18 +351,47 @@ async def delete_xlsx_files(update, context) -> None:
     directory_path = './'
 
     try:
-        # Iterate through files in the directory and try to delete '*.xlsx' files
+        # Iterate through files in the directory and try to delete '*.png' files with names longer than 11 characters
         for filename in os.listdir(directory_path):
             if filename.endswith(".xlsx"):
-                if filename:
-                    file_path = os.path.join(directory_path, filename)
-                    try:
-                        os.remove(file_path)
-                        await update.message.reply_text(f'{filename} has been deleted successfully!')
-                    except Exception as e:
-                        # Log any errors that may occur during the file deletion process
-                        error_message = f"Error deleting {filename}: {str(e)}"
-                        await context.bot.send_message(chat_id=chat_id, text=error_message)
+                file_path = os.path.join(directory_path, filename)
+                try:
+                    os.remove(file_path)
+                    await update.message.reply_text(f'{filename} has been deleted successfully!')
+                except Exception as e:
+                    # Log any errors that may occur during the file deletion process
+                    error_message = f"Error deleting {filename}: {str(e)}"
+                    await context.bot.send_message(chat_id=chat_id, text=error_message)
+
+        # Notify the user about the completion of the deletion process
+        await update.message.reply_text('Excel files have been deleted successfully!')
+    except Exception as e:
+        # Log any errors that may occur during the file iteration process
+        error_message = f"Error iterating through files: {str(e)}"
+        await context.bot.send_message(chat_id=chat_id, text=error_message)
+
+
+async def delete_png_files(update, context) -> None:
+    chat_id = update.message.chat_id
+    user_id = update.message.from_user.id
+
+    # Specify the directory where you want to delete '*.xlsx' files
+    directory_path = './reports/trash_media/'
+
+    try:
+        # Iterate through files in the directory and try to delete '*.xlsx' files
+        for filename in os.listdir(directory_path):
+            if filename.endswith(".png") and len(filename) > 11:
+                file_path = os.path.join(directory_path, filename)
+                try:
+                    os.remove(file_path)
+                    # msg = await update.message.reply_text(f'{filename} has been deleted successfully!')
+                    # await msg.delete()
+                except Exception as e:
+                    # Log any errors that may occur during the file deletion process
+                    error_message = f"Error deleting {filename}: {str(e)}"
+                    await context.bot.send_message(chat_id=chat_id, text=error_message)
+
 
         # Notify the user about the completion of the deletion process
         await update.message.reply_text('All files have been deleted successfully!')
@@ -375,4 +404,4 @@ async def delete_xlsx_files(update, context) -> None:
 button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
                     'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,  # 'FINSKIDKA📈': to_finskidka,
                     'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
-                    '🗑️ Clear Files': delete_xlsx_files}
+                    '🗑️ Clear Files': delete_xlsx_files, '🖼️ Delete PNG': delete_png_files}
