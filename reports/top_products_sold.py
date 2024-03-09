@@ -125,6 +125,7 @@ def save_workbook(workbook, output_file_path):
     except Exception as e:
         print(f"Error saving workbook: {e}")
 
+
 def create_bar_plot(df, output_file_path, type_value, title, x_column, y_column):
     print(f'Plotting {title}')
     # HOW MANY
@@ -166,7 +167,9 @@ def create_bar_plot(df, output_file_path, type_value, title, x_column, y_column)
     fig.figimage(logo, xo=1051.7, yo=65, alpha=0.5)  # Adjust xo, yo, and alpha as needed
     plt.savefig(output_picture_path, bbox_inches='tight')
     plt.close()
-def top_product_sold_generator():
+
+
+def top_product_sold_generator(login, password):
     ##################### LOADING IMPORTANT DATA ######################
     # Load environment variables from the .env file
     env_file_path = 'D:/Projects/.env'
@@ -239,6 +242,7 @@ def top_product_sold_generator():
     high_volume_products(df=df)
     client_fav_products(df=df)
 
+
 def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
     print("Creating TOP REVENUE PRODUCTS LIST🔝")
     # Record the start time
@@ -265,7 +269,7 @@ def top_revenue_products(df, output_file_path='TOP_REVENUE_PRODUCTS_SOLD.xlsx'):
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, values='TotalAmount', index=['Good'], columns=['RegionType'],
-                                     aggfunc='sum', fill_value=0,observed=False)
+                                     aggfunc='sum', fill_value=0, observed=False)
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')
@@ -326,7 +330,7 @@ def client_fav_products(df, output_file_path='CLIENT_FAVORITE_PRODUCTS.xlsx'):
 
         # Create a pivot table
         pivot_table = pd.pivot_table(grouped_df, index='Good', columns='RegionType', values='inn', aggfunc='sum',
-                                     fill_value=0,observed=False)
+                                     fill_value=0, observed=False)
 
         # Drop the 'Admin' column
         pivot_table.drop(columns=['Админ'], inplace=True, errors='ignore')

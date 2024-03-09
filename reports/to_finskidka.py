@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
 
-def to_finskidka_generator():
+def to_finskidka_generator(login, password):
     ##################### LOADING IMPORTANT DATA ######################
     # Load environment variables from the .env file
     env_file_path = 'D:/Projects/.env'
@@ -21,8 +21,8 @@ def to_finskidka_generator():
     ##################### ACCESS ENV VARIABLES ######################
     db_server = os.getenv("DB_SERVER")
     db_database = os.getenv("DB_DATABASE_SERGELI")
-    db_user = os.getenv("DB_USER2")
-    db_password = os.getenv("DB_PASSWORD2")
+    # db_user = os.getenv("DB_USER2")
+    # db_password = os.getenv("DB_PASSWORD2")
     db_port = os.getenv("DB_PORT")
     db_driver_name = os.getenv("DB_DRIVER_NAME")
 
@@ -35,7 +35,7 @@ def to_finskidka_generator():
     date_end = datetime(2024, 1, 31).strftime('%Y%m%d')
     ##################### CONNECTION STRING AND SQL QUERY ######################
     # Construct the connection string
-    conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
+    conn_str = f"mssql+pyodbc://{login}:{password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
     engine = create_engine(conn_str)
 
     sql_query = f"""

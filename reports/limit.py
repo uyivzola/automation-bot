@@ -12,7 +12,7 @@ from openpyxl.utils import get_column_letter
 from sqlalchemy import create_engine  # For creating a connection engine
 
 
-def limit_generator():
+def limit_generator(login, password):
     print('Started running Limit')
     start_time = time.time()
     # Load environment variables from the .env file

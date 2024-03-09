@@ -16,7 +16,7 @@ END_MONTH = 12
 env_file_path = 'D:/Projects/.env'
 
 
-def excluded_clients():
+def excluded_clients(login, password):
     print('Generating Excluded Clients list')
     time1 = time.time()
     # Load environment variables from the .env file

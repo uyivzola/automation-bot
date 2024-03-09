@@ -11,9 +11,9 @@ from reports.formatter import formatter
 from reports.inn_for_oxvat import excluded_clients
 
 
-def oxvat_generator():
+def oxvat_generator(login, password):
     print('Started running oxvat_generator')
-    oxvated_clients = excluded_clients()
+    oxvated_clients = excluded_clients(login, password)
     print('Started Gathering Clients Limit')
     start_time = time.time()
 

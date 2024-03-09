@@ -75,6 +75,8 @@ async def oxvat(update, context):
 
     today_date = datetime.now().strftime('%d %b')
     file_name = f'NE OXVACHEN - {today_date}.xlsx'
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
 
     # Send a preliminary message
     message = await update.message.reply_text(f'*NE OXVACHEN \- {today_date}\.xlsx*\n\nfayl tayyorlanmoqda😎\n\n'
@@ -82,14 +84,14 @@ async def oxvat(update, context):
                                               reply_to_message_id=message_id)
     try:
         if not os.path.exists(file_name):
-            oxvat_generator()
+            oxvat_generator(login, password)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
         time_difference = current_time - modification_time
 
         if time_difference >= timedelta(hours=2):
-            oxvat_generator()
+            oxvat_generator(login, password)
         # Open and send the document
         with open(file_name, 'rb') as document:
             await context.bot.send_document(chat_id, document,
@@ -107,6 +109,9 @@ async def top(update, context):
     chat_id = update.message.chat_id
     message_id = update.message.message_id
 
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
+
     today_date = datetime.now().strftime('%d %b')
     file_names = [f'TOP ostatok - {today_date}.xlsx', f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx']
     # Send a preliminary message
@@ -117,7 +122,7 @@ async def top(update, context):
         # Open and send the document
         for file in file_names:
             if not os.path.exists(file):
-                top_generator()
+                top_generator(login, password)
             # Check the modification time of the file
             modification_time = datetime.fromtimestamp(os.path.getmtime(file))
 
@@ -127,7 +132,7 @@ async def top(update, context):
             # Check if the file was modified more than 2 hours ago
             time_difference = current_time - modification_time
             if time_difference >= timedelta(minutes=1):
-                top_generator()
+                top_generator(login, password)
 
             with open(file, 'rb') as document:
                 print(f'Sending {file}')
@@ -149,6 +154,9 @@ async def limit(update, context):
     file_name = f'LIMIT - {today_date}.xlsx'
     chat_id = update.message.chat_id
 
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
+
     # Send a preliminary message
     message = await update.message.reply_text(
         f"Sizning so\'rovingiz bo\'yicha  \n *LIMIT \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 "
@@ -156,14 +164,14 @@ async def limit(update, context):
 
     try:
         if not os.path.exists(file_name):
-            limit_generator()
+            limit_generator(login, password)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
         time_difference = current_time - modification_time
 
         if time_difference >= timedelta(hours=2):
-            limit_generator()
+            limit_generator(login, password)
 
         # Open and send the document
         with open(file_name, 'rb') as document:
@@ -185,6 +193,9 @@ async def hourly(update, context):
     first_name = user.first_name
     message_id = update.message.message_id
 
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
+
     today_date = datetime.now().strftime('%d %b')
     file_name = f'HOURLY.xlsx'
     chat_id = update.message.chat_id
@@ -196,14 +207,14 @@ async def hourly(update, context):
 
     try:
         if not os.path.exists(file_name):
-            hourly_generator()
+            hourly_generator(login, password)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
         time_difference = current_time - modification_time
 
         if time_difference >= timedelta(hours=2):
-            hourly_generator()
+            hourly_generator(login, password)
         # Open and send the document
         with open(file_name, 'rb') as document:
             await context.bot.send_document(chat_id, document,
@@ -224,6 +235,8 @@ async def to_finskidka(update, context):
     username = user.first_name
     message_id = update.message.message_id
 
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
     today_date = datetime.now().strftime('%d %b')
     file_name = f'TOandFinSkidka.xlsx'
     chat_id = update.message.chat_id
@@ -235,7 +248,7 @@ async def to_finskidka(update, context):
 
     try:
         if not os.path.exists(file_name):
-            to_finskidka_generator()
+            to_finskidka_generator(login, password)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
@@ -243,7 +256,7 @@ async def to_finskidka(update, context):
 
         if time_difference >= timedelta(hours=2):
             print(f'i am running {to_finskidka_generator.__name__}')
-            to_finskidka_generator()
+            to_finskidka_generator(login, password)
 
         # Open and send the document
         with open(file_name, 'rb') as document:
@@ -267,6 +280,9 @@ async def monthly(update, context):
     chat_id = update.message.chat_id
     message_id = update.message.message_id
 
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
+
     # Send a preliminary message
     message = await update.message.reply_text(f"*SALES\.xlsx*\n\nfayl tayyorlanmoqda😎 \n\n"
                                               "||Iltimos kuting⌛⌛⌛\(Maksimum 8 daqiqa\)||", parse_mode='MarkdownV2',
@@ -274,14 +290,14 @@ async def monthly(update, context):
 
     try:
         if not os.path.exists(file_name):
-            monthly_generator()
+            monthly_generator(login, password)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
         time_difference = current_time - modification_time
 
         if time_difference >= timedelta(hours=2):
-            monthly_generator()
+            monthly_generator(login, password)
 
         # Open and send the document
         with open(file_name, 'rb') as document:
@@ -308,6 +324,9 @@ async def top_high_fav(update, context):
     current_date = datetime.now()
     formatted_date = f'{current_date.day} {current_date.strftime("%B")}'
 
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
+
     top_files = {
         'TOP_REVENUE_PRODUCTS_SOLD.xlsx': 'Товары, приносящие наибольший доход, среди клиентов в различных регионах и типах на',
         'HIGH_VOLUME_PRODUCTS.xlsx': 'Товары с наибольшим объемом(колич) продаж среди клиентов в различных регионах и типах на',
@@ -318,7 +337,7 @@ async def top_high_fav(update, context):
 
     try:
         for file, file_desc in top_files.items():
-            top_product_sold_generator()
+            top_product_sold_generator(login, password)
             # Open and send the document
             with open(file, 'rb') as document:
                 caption_text = (f"\n\n{file_desc}\n<b><u>{formatted_date}</u></b>\n\n\n")
@@ -391,7 +410,6 @@ async def delete_png_files(update, context) -> None:
                     # Log any errors that may occur during the file deletion process
                     error_message = f"Error deleting {filename}: {str(e)}"
                     await context.bot.send_message(chat_id=chat_id, text=error_message)
-
 
         # Notify the user about the completion of the deletion process
         await update.message.reply_text('All files have been deleted successfully!')

@@ -6,10 +6,9 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
 from reports.formatter import formatter
-from reports.google_sheets import upload_to_google_sheet
 
 
-def hourly_generator():
+def hourly_generator(login, password):
     ##################### LOADING IMPORTANT DATA ######################
     # Load environment variables from the .env file
     env_file_path = 'D:/Projects/.env'

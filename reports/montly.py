@@ -8,7 +8,7 @@ from sqlalchemy import create_engine  # For creating a connection engine
 from reports.formatter import formatter
 
 
-def monthly_generator():
+def monthly_generator(login, password):
     ############## LOADING IMPORTANT DATA ######################
     print('Started running monthly generator')
     # Load environment variables from the .env file

@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from reports.formatter import formatter
 
 
-def top_generator():
+def top_generator(login, password):
     print('Started running top generator')
     env_file_path = 'D:/Projects/.env'
     load_dotenv(env_file_path)
