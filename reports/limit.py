@@ -58,7 +58,7 @@ def limit_generator(login, password):
     df = df[df['Свободный лимит'] > 200_000]
     df.sort_values(by=['Region', 'ClientMan'], inplace=True)
     df.rename(columns={'Region': 'Регион', 'ClientMan': "Ответственный Менеджер"}, inplace=True)
-    df.drop_duplicates(subset=['ИНН клиента'], inplace=True)
+    df.drop_duplicates(subset=    ['ИНН клиента'], inplace=True)
     end_time = time.time()
     df.to_excel(output_file_path, index=False)
     print(f"Data Preparation took: {round(end_time - start_time, 0)} seconds.")
@@ -71,7 +71,7 @@ def limit_generator(login, password):
 
     # 1. Color first row (headers) with 4CB9E7 color code
     header_style = NamedStyle(name='header_style',
-                              fill=PatternFill(start_color='4CB9E7', end_color='4CB9E7', fill_type='solid'))
+    fill=PatternFill(start_color='4CB9E7', end_color='4CB9E7', fill_type='solid'))
 
     for cell in worksheet[1]:
         cell.style = header_style
