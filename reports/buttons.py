@@ -83,15 +83,12 @@ async def oxvat(update, context):
                                               '||Iltimos kuting⌛⌛⌛\(Maksimum 3 daqiqa\)||', parse_mode='MarkdownV2',
                                               reply_to_message_id=message_id)
     try:
-        if not os.path.exists(file_name):
-            oxvat_generator(login, password)
+        oxvat_generator(login, password)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
         time_difference = current_time - modification_time
 
-        if time_difference >= timedelta(hours=2):
-            oxvat_generator(login, password)
         # Open and send the document
         with open(file_name, 'rb') as document:
             await context.bot.send_document(chat_id, document,
@@ -111,12 +108,13 @@ async def top(update, context):
 
     login = context.user_data.get("login", "")
     password = context.user_data.get("password", "")
+    personal_name = context.user_data.get("personal_name", "")
 
     today_date = datetime.now().strftime('%d %b')
     file_names = [f'TOP ostatok - {today_date}.xlsx', f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx']
     # Send a preliminary message
     message = await update.message.reply_text(
-        f"Sizning so\'rovingiz bo\'yicha \n *TOP ostatok \- {today_date}\.xlsx* \nfayl tayyorlanmoqda😎 "
+        f"Hurmatli {personal_name},Sizning so\'rovingiz bo\'yicha \n *TOP ostatok \- {today_date}\.xlsx* \nfayl tayyorlanmoqda😎 "
         "Iltimos kuting⌛\(Maksimum 3 daqiqa\)", parse_mode='MarkdownV2', reply_to_message_id=message_id)
     try:
         # Open and send the document
@@ -156,28 +154,18 @@ async def limit(update, context):
 
     login = context.user_data.get("login", "")
     password = context.user_data.get("password", "")
-
+    personal_name = context.user_data.get("personal_name", "")
     # Send a preliminary message
     message = await update.message.reply_text(
-        f"Sizning so\'rovingiz bo\'yicha  \n *LIMIT \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 "
+        f"Hurmatli *{personal_name}*, Sizning so\'rovingiz bo\'yicha  \n *LIMIT \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 "
         "Iltimos kuting⌛⌛⌛ \(o\'rtacha 5 daqiqa\)", parse_mode='MarkdownV2', reply_to_message_id=message_id)
 
     try:
-        if not os.path.exists(file_name):
-            limit_generator(login, password)
-
-        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
-        current_time = datetime.now()
-        time_difference = current_time - modification_time
-
-        if time_difference >= timedelta(hours=2):
-            limit_generator(login, password)
+        limit_generator(login, password, context)
 
         # Open and send the document
         with open(file_name, 'rb') as document:
-            await context.bot.send_document(chat_id, document, caption=f"\n\n\n\n\n"
-                                                                       f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
-                                            reply_to_message_id=message_id)
+            await context.bot.send_document(chat_id, document, reply_to_message_id=message_id)
 
         # Delete the preliminary message
         await message.delete()  # await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
@@ -419,7 +407,10 @@ async def delete_png_files(update, context) -> None:
         await context.bot.send_message(chat_id=chat_id, text=error_message)
 
 
-button_functions = {'LIMIT💸': limit, 'OXVAT🙈': oxvat, 'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
-                    'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,  # 'FINSKIDKA📈': to_finskidka,
-                    'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
-                    '🗑️ Clear Files': delete_xlsx_files, '🖼️ Delete PNG': delete_png_files}
+button_functions = {
+    'LIMIT💸': limit,
+    'OXVAT🙈': oxvat,
+    'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
+    'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,  # 'FINSKIDKA📈': to_finskidka,
+    'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
+    '🗑️ Clear Files': delete_xlsx_files, '🖼️ Delete PNG': delete_png_files}

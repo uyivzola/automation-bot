@@ -2,17 +2,19 @@ import logging
 # -*- coding: UTF-8 -*-
 import os
 from datetime import datetime, timedelta
-from time import sleep
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler, \
     CallbackContext
+from telegram.ext.filters import MessageFilter
 
 from reports.buttons import button_functions
 
-load_dotenv()
+env_file_path = 'D:/Projects/.env'
+load_dotenv(env_file_path)
+
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN2")
 BOT_USERNAME = os.getenv("BOT_USERNAME2")
 # Enable logging
@@ -28,6 +30,10 @@ buttons = ReplyKeyboardMarkup([button_texts[i:i + 2] for i in range(0, len(butto
 user_photos = 'reports/trash_media/user_photos'
 
 POSITION, PHOTO, PHONE_NUMBER, DELPHI_LOGIN, DELPHI_PASSWORD, REPORTS = range(6)
+
+ADMIN_BOT_ID = os.getenv("ADMIN_BOT_ID")
+BEKZOD_LOGIN_DELPHI = os.getenv('BEKZOD_LOGIN_DELPHI')
+BEKZOD_PASSWORD_DELPHI = os.getenv('BEKZOD_LOGIN_DELPHI')
 
 
 def log_user_message(user, message):
@@ -46,7 +52,7 @@ def log_user_message(user, message):
     print(log_message)
 
 
-def check_database_access(username, password) -> bool:
+def check_database_access(username, password, context) -> bool:
     # Load environment variables
     env_file_path = 'D:/Projects/.env'
     load_dotenv(env_file_path)
@@ -54,19 +60,24 @@ def check_database_access(username, password) -> bool:
     db_database = os.getenv("DB_DATABASE_SERGELI")
     db_port = os.getenv("DB_PORT")
     db_driver_name = os.getenv("DB_DRIVER_NAME")
-
+    # print(username = , password = )
     # Construct the connection string
     conn_str = f"mssql+pyodbc://{username}:{password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
     try:
         # Attempt to connect to the database
         engine = create_engine(conn_str)
         connection = engine.connect()
-        login_name = username
-        query = f"SELECT P.Name FROM PERSONAL AS P WHERE P.LoginName = {login_name}"
-        result = connection.execute(query)
-        personal_name = result.fetchone()['Name']
-
-        print(f'Here is the info about {personal_name}!')
+        # Use text() to create a parameterized query
+        query = text("SELECT P.Name FROM PERSONAL AS P WHERE P.LoginName = :username")
+        result = connection.execute(query, {"username": username})
+        row = result.fetchone()
+        if row:
+            personal_name = row[0]
+            print(f'User {personal_name} ')
+            context.user_data["personal_name"] = personal_name
+            print(context.user_data["personal_name"])
+        else:
+            print(f'No data found for the {username}')
         connection.close()
         return True
     except Exception as e:
@@ -88,14 +99,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         current_time = datetime.now()
         elapsed_time = current_time - start_time
         # If less than 7 days have passed, restart the existing conversation
-        if elapsed_time < timedelta(seconds=41):
+        if elapsed_time < timedelta(hours=30):
             await update.message.reply_text("Welcome back! Your conversation has been restarted.")
             return POSITION
-
+    user_id = update.message.from_user.id
+    print(user_id)
     context.user_data['start_time'] = datetime.now()
+    if user_id == str(ADMIN_BOT_ID):
+        context.user_data["login"] = BEKZOD_LOGIN_DELPHI
+        context.user_data["password"] = BEKZOD_PASSWORD_DELPHI
+        return REPORTS
     await update.message.reply_text(
         "ASSALOMU ALAYKUM!\nMeni 👨🏼‍🔬Professor @HOPXOL yaratgan.\n\n\nMening vazifam sizga ishingizda yordam berish. Iltimos, lavozimingizni ko'rsating:",
         reply_markup=reply_markup)
+
     return POSITION
 
 
@@ -105,12 +122,12 @@ async def position(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     message_id = update.message.message_id
 
     user = update.message.from_user.first_name
-    gender = update.message.text
+    position = update.message.text
 
-    logger.info("Gender of %s: %s", user, gender)
-    context.user_data['gender'] = gender
+    logger.info("Position of %s: %s", user, position)
+    context.user_data['position'] = position
     await context.bot.send_photo(chat_id, photo='reports/trash_media/user_photos/sample_photo.jpg',
-                                 caption=f'Iltimos, o\'zingizning rasmingizni quyidagicha ko\'rinishda yuboring 📸',
+                                 caption=f'Iltimos, o\'zingizning rasmingizni quyidagicha ko\'rinishda yuboring 😎📸',
                                  reply_to_message_id=message_id, reply_markup=ReplyKeyboardRemove())
     return PHOTO
 
@@ -149,6 +166,7 @@ async def phone_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     await update.message.reply_text(f"Delphi LOGIN kiriting 👀: ", reply_markup=ReplyKeyboardRemove())
 
     logger.info("Login of %s: %s", user.first_name, update.message.text)
+    context.user_data["login"] = update.message.text
 
     return DELPHI_LOGIN
 
@@ -161,7 +179,7 @@ async def delphi_login(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     context.user_data["login"] = update.message.text
 
     # Delete the login message from the user's perspective
-    await context.bot.deleteMessage(chat_id=chat_id, message_id=message_id)
+    # await context.bot.deleteMessage(chat_id=chat_id, message_id=message_id)
 
     await update.message.reply_text(f"Sizning loginingiz {update.message.text} \n \n"
                                     f"Parolingizni kiriting:")
@@ -182,16 +200,16 @@ async def delphi_password(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         return ConversationHandler.END
 
     # Store the password securely in the user_data
-    context.user_data["login"] = context.user_data.get("login", "")
-    context.user_data["password"] = password
-
+    username = context.user_data.get("login", "")
+    password = update.message.text
+    print(username, password)
     # Delete the password message from the user's perspective
     await context.bot.deleteMessage(chat_id=chat_id, message_id=message_id)
 
     logger.info("Password of %s: %s", user.first_name, update.message.text)
     msg = await update.message.reply_text('Sizning Bazaga dostupingizni tekshirayapman. Kuting... 🔐')
-    has_access = check_database_access(username=context.user_data["login"], password=context.user_data["password"])
-    sleep(1)
+    has_access = check_database_access(username=username, password=password, context=context)
+    # sleep(1)
     if has_access:
         # await update.message.reply_text('Connection is on its way...', reply_to_message_id=message_id)
         await context.bot.send_message(text='✅🔗Соединение успешно выполнено!\n\n'
@@ -243,9 +261,10 @@ restart_markup = ReplyKeyboardMarkup(restart_reply_keyboard, one_time_keyboard=T
                                      input_field_placeholder='RESTART🔁')
 
 
-async def restart(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("Qayta yangilash uchun \n/start\n/start\n/start\n ni bosing",
+async def admin_message_handler(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text("ASSALOMU ALAYKUM ADMIN!",
                                     reply_markup=restart_markup)
+    return REPORTS
 
 
 def main() -> None:
@@ -256,6 +275,7 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler('start', start),
+            # MessageHandler(filters.TEXT & admin_message_handler),
             MessageHandler(filters.TEXT, start)
         ],
         states={
