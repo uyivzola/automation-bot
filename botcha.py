@@ -1,3 +1,4 @@
+import csv
 import logging
 # -*- coding: UTF-8 -*-
 import os
@@ -8,7 +9,6 @@ from sqlalchemy import create_engine, text
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler, \
     CallbackContext
-from telegram.ext.filters import MessageFilter
 
 from reports.buttons import button_functions
 
@@ -188,6 +188,17 @@ async def delphi_login(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     return DELPHI_PASSWORD
 
 
+def write_to_csv(data):
+    csv_file_path = 'user_data.csv'
+    headers = ["Position", "Photo_URL", "Phone_Number", "Delphi_Login", "Delphi_Password", "Personal_Name"]
+    mode = 'a' if os.path.exists(csv_file_path) else 'w'
+    with open(csv_file_path, mode, newline='', encoding='utf-8-sig') as file:
+        writer = csv.DictWriter(file, fieldnames=headers)
+        if mode == 'w':
+            writer.writeheader()
+        writer.writerow(data)
+
+
 async def delphi_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores the Delphi Password and asks for user his/her access"""
     user = update.message.from_user
@@ -207,19 +218,41 @@ async def delphi_password(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await context.bot.deleteMessage(chat_id=chat_id, message_id=message_id)
 
     logger.info("Password of %s: %s", user.first_name, update.message.text)
+    position = context.user_data.get('position', '')
+    photo_url = context.user_data.get('picture_id', '')
+    phone_number = context.user_data.get('phone_number', '')
+    delphi_login = context.user_data.get('login', '')
+    delphi_password = password  # Assuming password is stored here
+    sql_output = context.user_data.get('personal_name', '')
+
+    # Construct the data dictionary
+    data = {
+        'Position': position,
+        'Photo': photo_url,
+        'Phone Number': phone_number,
+        'Delphi Login': delphi_login,
+        'Delphi Password': delphi_password,
+        'SQL Output': sql_output
+    }
+
+    # Write data to CSV
+    # write_to_csv(data)
     msg = await update.message.reply_text('Sizning Bazaga dostupingizni tekshirayapman. Kuting... 🔐')
     has_access = check_database_access(username=username, password=password, context=context)
     # sleep(1)
+    # has_access = True
     if has_access:
         # await update.message.reply_text('Connection is on its way...', reply_to_message_id=message_id)
         await context.bot.send_message(text='✅🔗Соединение успешно выполнено!\n\n'
                                             'Чтобы получить отчеты, Нажмите кнопки👇🏼', chat_id=chat_id,
                                        reply_markup=buttons)
         await msg.delete()
+        # After checking the database access, collect the required information
+
         return REPORTS
     else:
         await update.message.reply_text('Login yoki Parolingiz xato! Qayta tekshiring.')
-        return DELPHI_LOGIN
+        return REPORTS
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -289,11 +322,7 @@ def main() -> None:
         }, fallbacks=[CommandHandler("cancel", cancel)]
     )
 
-    # application.add_handler(CommandHandler("start", start, block=False))
     application.add_handler(conv_handler)
-    # application.add_handler(MessageHandler(filters.Regex("^(RESTART🔁)"), conv_handler))
-    # application.add_handler(CommandHandler(filters.Regex("^(RESTART🔁)"), start))
-    # application.add_handler(MessageHandler(filters.TEXT, restart))
     application.add_handler(CommandHandler("help", help_command, block=False))
 
     # Run the bot until the user presses Ctrl-C

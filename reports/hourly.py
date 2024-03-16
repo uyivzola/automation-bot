@@ -33,8 +33,8 @@ def hourly_generator(login, password):
     ##################### PROCEDURE NAME ######################
     procedure_name = os.getenv("HOURLY_SHORT")  # THIS IS HOURLY DATA GATHERING
 
-    ##################### DATE - JANUARY ######################
-    CURRENT_MONTH = 1
+    ##################### DATE - MARCH ######################
+    CURRENT_MONTH = 3
     CURRENT_YEAR = 2024
     today_date = datetime.now().strftime('%d/%m/%Y')
     tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%d/%m/%Y')

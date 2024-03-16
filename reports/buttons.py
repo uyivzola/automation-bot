@@ -194,20 +194,17 @@ async def hourly(update, context):
                                               reply_to_message_id=message_id)
 
     try:
-        if not os.path.exists(file_name):
-            hourly_generator(login, password)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
         time_difference = current_time - modification_time
 
-        if time_difference >= timedelta(hours=2):
-            hourly_generator(login, password)
+        hourly_generator(login, password)
         # Open and send the document
         with open(file_name, 'rb') as document:
             await context.bot.send_document(chat_id, document,
-                                            caption=f"Analitikangizga aniqlik tilayman!📈, {first_name}💋💖!\n \n\n"
-                                                    f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
+                                            # caption=f"Analitikangizga aniqlik tilayman!📈, {first_name}💋💖!\n \n\n",
+                                            # f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                             reply_to_message_id=message_id)
         await message.delete()  # Send a final message
 
@@ -411,6 +408,7 @@ button_functions = {
     'LIMIT💸': limit,
     'OXVAT🙈': oxvat,
     'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
-    'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,  # 'FINSKIDKA📈': to_finskidka,
+    'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
+    # 'FINSKIDKA📈': to_finskidka,
     'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
     '🗑️ Clear Files': delete_xlsx_files, '🖼️ Delete PNG': delete_png_files}
