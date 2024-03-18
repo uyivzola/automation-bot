@@ -11,6 +11,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
     CallbackContext
 
 from reports.buttons import button_functions
+from reports.weather import weather
 
 env_file_path = 'D:/Projects/.env'
 load_dotenv(env_file_path)
@@ -89,7 +90,7 @@ def check_database_access(username, password, context) -> bool:
 # context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """ Starts the conversation and ask the user about their gender"""
-    reply_keyboard = [['Regional Director🔝', 'Sales Manager💬', 'BOSS🔥']]
+    reply_keyboard = [['Regional Director🔝', 'Sales Manager💬', 'BOSS🔥', 'WEATHER❄️☀️ for today']]
 
     reply_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True,
                                        input_field_placeholder="Lavozimingiz nima?")
@@ -120,10 +121,12 @@ async def position(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores selected gender and asks for a photo of the user"""
     chat_id = update.message.chat_id
     message_id = update.message.message_id
-
+    messsage_text = update.message.text
     user = update.message.from_user.first_name
     position = update.message.text
-
+    print(messsage_text)
+    if messsage_text == 'WEATHER❄️☀️ for today':
+        await weather(update, context)
     logger.info("Position of %s: %s", user, position)
     context.user_data['position'] = position
     await context.bot.send_photo(chat_id, photo='reports/trash_media/user_photos/sample_photo.jpg',
@@ -308,11 +311,10 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler('start', start),
-            # MessageHandler(filters.TEXT & admin_message_handler),
             MessageHandler(filters.TEXT, start)
         ],
         states={
-            POSITION: [MessageHandler(filters.Regex("^(Regional Director🔝|Sales Manager💬|BOSS🔥$)"), position)],
+            POSITION: [MessageHandler(filters.Regex("^(Regional Director🔝|Sales Manager💬|BOSS🔥|WEATHER❄️☀️ for today$)"), position)],
             PHOTO: [MessageHandler(filters.PHOTO, photo)],
             # LOCATION: [MessageHandler(filters._Location(), location)],
             PHONE_NUMBER: [MessageHandler(filters._Contact(), phone_number)],

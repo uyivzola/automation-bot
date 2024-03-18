@@ -13,6 +13,7 @@ from reports.oxvat import oxvat_generator
 from reports.to_finskidka import to_finskidka_generator
 from reports.top import top_generator
 from reports.top_products_sold import top_product_sold_generator
+from reports.weather import weather
 
 
 async def chuck_norris_jokes(update, context):
@@ -410,5 +411,6 @@ button_functions = {
     'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
     'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
     # 'FINSKIDKA📈': to_finskidka,
+    'WEATHER❄️☀️ for today': weather,
     'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
     '🗑️ Clear Files': delete_xlsx_files, '🖼️ Delete PNG': delete_png_files}
