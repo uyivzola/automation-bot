@@ -1,7 +1,7 @@
 /.env
 /reports/credentials.json
+reports/trash_media
 /venv/
 *.xlsx
 *png
-
 *.ipynb
