@@ -7,10 +7,10 @@ import pandas as pd  # For working with DataFrames
 from dotenv import load_dotenv
 from sqlalchemy import create_engine  # For creating a connection engine
 
-CURRENT_MONTH = 3
-CURRENT_YEAR = 2024
+CURRENT_MONTH = datetime.now().month
+CURRENT_YEAR = datetime.now().year
 START_DATE = 1
-END_DATE = 31
+END_DATE = datetime.now().day-1
 END_MONTH = 12
 
 env_file_path = 'D:/Projects/.env'

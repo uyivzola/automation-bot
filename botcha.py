@@ -90,7 +90,7 @@ def check_database_access(username, password, context) -> bool:
 # context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """ Starts the conversation and ask the user about their gender"""
-    reply_keyboard = [['Regional Director🔝', 'Sales Manager💬', 'BOSS🔥', 'WEATHER❄️☀️ for today']]
+    reply_keyboard = [['Regional Director🔝', 'Sales Manager💬', 'BOSS🔥', 'WEATHER❄️☀️ for today', 'ADMIN']]
 
     reply_markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True,
                                        input_field_placeholder="Lavozimingiz nima?")
@@ -113,7 +113,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(
         "ASSALOMU ALAYKUM!\nMeni 👨🏼‍🔬Professor @HOPXOL yaratgan.\n\n\nMening vazifam sizga ishingizda yordam berish. Iltimos, lavozimingizni ko'rsating:",
         reply_markup=reply_markup)
-
+    msg = update
+    print(msg)
     return POSITION
 
 
@@ -129,7 +130,7 @@ async def position(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await weather(update, context)
     logger.info("Position of %s: %s", user, position)
     context.user_data['position'] = position
-    await context.bot.send_photo(chat_id, photo='reports/trash_media/user_photos/sample_photo.jpg',
+    await context.bot.send_photo(chat_id, photo='Behzods photo.jpg',
                                  caption=f'Iltimos, o\'zingizning rasmingizni quyidagicha ko\'rinishda yuboring 😎📸',
                                  reply_to_message_id=message_id, reply_markup=ReplyKeyboardRemove())
     return PHOTO
@@ -314,7 +315,9 @@ def main() -> None:
             MessageHandler(filters.TEXT, start)
         ],
         states={
-            POSITION: [MessageHandler(filters.Regex("^(Regional Director🔝|Sales Manager💬|BOSS🔥|WEATHER❄️☀️ for today$)"), position)],
+            POSITION: [
+                MessageHandler(filters.Regex("^(Regional Director🔝|Sales Manager💬|BOSS🔥|WEATHER❄️☀️ for today$)"),
+                               position)],
             PHOTO: [MessageHandler(filters.PHOTO, photo)],
             # LOCATION: [MessageHandler(filters._Location(), location)],
             PHONE_NUMBER: [MessageHandler(filters._Contact(), phone_number)],

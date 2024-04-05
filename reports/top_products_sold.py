@@ -188,7 +188,8 @@ def top_product_sold_generator(login, password):
     db_driver_name = os.getenv("DB_DRIVER_NAME")
     ##################### PROCEDURE NAME ######################
     procedure_name = 'zAdmReportDFS_short'  # THIS IS HOURLY DATA GATHERING
-    today_date = datetime.now().strftime('%Y%m%d')
+    today_date = (datetime.now()).strftime('%Y%m%d')
+    yesterday_date = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
     tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y%m%d')
 
     ##################### CONNECTION STRING AND SQL QUERY ######################
@@ -206,7 +207,7 @@ def top_product_sold_generator(login, password):
     """
 
     #####################  EXECUTION  ######################
-    df = pd.read_sql_query(sql_query, engine, params=(today_date, tomorrow_date))
+    df = pd.read_sql_query(sql_query, engine, params=(yesterday_date, today_date))
     df.columns = ['DocumentType', 'Invoice Number', 'Goodid', 'Good', 'Manufacturer', 'inn', 'ClientName',
                   'SalesManager', 'ClientMan', 'PaymentTerm', 'BasePrice', 'SellingPrice', 'Quantity', 'DateEntered',
                   'BaseAmount', 'TotalAmount']
@@ -215,7 +216,9 @@ def top_product_sold_generator(login, password):
     df['DateEntered'] = pd.to_datetime(df['DateEntered'])
     # Filter the DataFrame for today's date
     today_date = datetime.today().strftime("%Y-%m-%d")
-    df = df[(df['DateEntered'].dt.date == pd.to_datetime(today_date).date()) & df['SalesManager'] != '']
+
+    df = df[(df['DateEntered'].dt.date == pd.to_datetime(yesterday_date).date()) & df[
+        'SalesManager'] != 'Бочкарева Альвина']
 
     df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
 

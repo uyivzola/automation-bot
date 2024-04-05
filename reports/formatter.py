@@ -41,7 +41,6 @@ def formatter(df, output_file_path):
     number_format = NamedStyle(name='number_format', number_format='### ### ### ##0')
 
     # Specify the columns to format based on float64 datatype
-    # Specify the columns to format based on float64 datatype
     float64_columns = df.select_dtypes(include=['float64']).columns
 
     for col in float64_columns:

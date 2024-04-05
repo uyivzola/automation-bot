@@ -193,14 +193,14 @@ async def hourly(update, context):
     message = await update.message.reply_text(f"*HOURLY \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 \n\n"
                                               "||Iltimos kuting⌛⌛⌛\(Maksimum 3 daqiqa\)||", parse_mode='MarkdownV2',
                                               reply_to_message_id=message_id)
-
+    hourly_generator(login, password)
     try:
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
         time_difference = current_time - modification_time
-
-        hourly_generator(login, password)
+        if not os.path.exists(file_name):
+            hourly_generator(login, password)
         # Open and send the document
         with open(file_name, 'rb') as document:
             await context.bot.send_document(chat_id, document,

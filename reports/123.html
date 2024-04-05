@@ -1,0 +1,3224 @@
+<html lang="ru" class="" style="">
+<link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
+<link type="text/css" rel="stylesheet" id="dark-mode-general-link">
+<style lang="en" type="text/css" id="dark-mode-custom-style"></style>
+<style lang="en" type="text/css" id="dark-mode-native-style"></style>
+<style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
+<head>
+    <meta charset="utf-8">
+    <title>Журнал звонков</title>
+    <base href="/freport/">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #b71c1c;
+            border-bottom: 16px solid #b71c1c;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="styles.1ea40cb0984404a9b0f1.css">
+    <style></style>
+    <style>@media screen and (-ms-high-contrast: active) {
+        .mat-toolbar {
+            outline: solid 1px
+        }
+    }
+
+    .mat-toolbar-row, .mat-toolbar-single-row {
+        display: flex;
+        box-sizing: border-box;
+        padding: 0 16px;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        white-space: nowrap
+    }
+
+    .mat-toolbar-multiple-rows {
+        display: flex;
+        box-sizing: border-box;
+        flex-direction: column;
+        width: 100%
+    }
+
+    .mat-toolbar-multiple-rows {
+        min-height: 64px
+    }
+
+    .mat-toolbar-row, .mat-toolbar-single-row {
+        height: 64px
+    }
+
+    @media (max-width: 599px) {
+        .mat-toolbar-multiple-rows {
+            min-height: 56px
+        }
+
+        .mat-toolbar-row, .mat-toolbar-single-row {
+            height: 56px
+        }
+    }</style>
+    <style type="text/css">
+        /*
+  @angular/flex-layout - workaround for possible browser quirk with mediaQuery listeners
+  see http://bit.ly/2sd4HMP
+*/
+        @media screen and (min-width: 600px), screen and (min-width: 960px), screen and (min-width: 1280px), screen and (min-width: 1920px), screen and (min-width: 1920px) and (max-width: 4999.99px), screen and (max-width: 1919.99px), screen and (min-width: 1280px) and (max-width: 1919.99px), screen and (max-width: 1279.99px), screen and (min-width: 960px) and (max-width: 1279.99px), screen and (max-width: 959.99px), screen and (min-width: 600px) and (max-width: 959.99px), screen and (max-width: 599.99px), screen and (min-width: 0px) and (max-width: 599.99px), print {
+            .fx-query-test {
+            }
+        }
+    </style>
+    <style>.mat-button .mat-button-focus-overlay, .mat-icon-button .mat-button-focus-overlay {
+        opacity: 0
+    }
+
+    .mat-button:hover .mat-button-focus-overlay, .mat-stroked-button:hover .mat-button-focus-overlay {
+        opacity: .04
+    }
+
+    @media (hover: none) {
+        .mat-button:hover .mat-button-focus-overlay, .mat-stroked-button:hover .mat-button-focus-overlay {
+            opacity: 0
+        }
+    }
+
+    .mat-button, .mat-flat-button, .mat-icon-button, .mat-stroked-button {
+        box-sizing: border-box;
+        position: relative;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        outline: 0;
+        border: none;
+        -webkit-tap-highlight-color: transparent;
+        display: inline-block;
+        white-space: nowrap;
+        text-decoration: none;
+        vertical-align: baseline;
+        text-align: center;
+        margin: 0;
+        min-width: 64px;
+        line-height: 36px;
+        padding: 0 16px;
+        border-radius: 4px;
+        overflow: visible
+    }
+
+    .mat-button::-moz-focus-inner, .mat-flat-button::-moz-focus-inner, .mat-icon-button::-moz-focus-inner, .mat-stroked-button::-moz-focus-inner {
+        border: 0
+    }
+
+    .mat-button[disabled], .mat-flat-button[disabled], .mat-icon-button[disabled], .mat-stroked-button[disabled] {
+        cursor: default
+    }
+
+    .mat-button.cdk-keyboard-focused .mat-button-focus-overlay, .mat-button.cdk-program-focused .mat-button-focus-overlay, .mat-flat-button.cdk-keyboard-focused .mat-button-focus-overlay, .mat-flat-button.cdk-program-focused .mat-button-focus-overlay, .mat-icon-button.cdk-keyboard-focused .mat-button-focus-overlay, .mat-icon-button.cdk-program-focused .mat-button-focus-overlay, .mat-stroked-button.cdk-keyboard-focused .mat-button-focus-overlay, .mat-stroked-button.cdk-program-focused .mat-button-focus-overlay {
+        opacity: .12
+    }
+
+    .mat-button::-moz-focus-inner, .mat-flat-button::-moz-focus-inner, .mat-icon-button::-moz-focus-inner, .mat-stroked-button::-moz-focus-inner {
+        border: 0
+    }
+
+    .mat-raised-button {
+        box-sizing: border-box;
+        position: relative;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        outline: 0;
+        border: none;
+        -webkit-tap-highlight-color: transparent;
+        display: inline-block;
+        white-space: nowrap;
+        text-decoration: none;
+        vertical-align: baseline;
+        text-align: center;
+        margin: 0;
+        min-width: 64px;
+        line-height: 36px;
+        padding: 0 16px;
+        border-radius: 4px;
+        overflow: visible;
+        transform: translate3d(0, 0, 0);
+        transition: background .4s cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .mat-raised-button::-moz-focus-inner {
+        border: 0
+    }
+
+    .mat-raised-button[disabled] {
+        cursor: default
+    }
+
+    .mat-raised-button.cdk-keyboard-focused .mat-button-focus-overlay, .mat-raised-button.cdk-program-focused .mat-button-focus-overlay {
+        opacity: .12
+    }
+
+    .mat-raised-button::-moz-focus-inner {
+        border: 0
+    }
+
+    ._mat-animation-noopable.mat-raised-button {
+        transition: none;
+        animation: none
+    }
+
+    .mat-stroked-button {
+        border: 1px solid currentColor;
+        padding: 0 15px;
+        line-height: 34px;
+        overflow: hidden
+    }
+
+    .mat-stroked-button .mat-button-focus-overlay, .mat-stroked-button .mat-button-ripple.mat-ripple {
+        border-radius: 0
+    }
+
+    .mat-fab {
+        box-sizing: border-box;
+        position: relative;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        outline: 0;
+        border: none;
+        -webkit-tap-highlight-color: transparent;
+        display: inline-block;
+        white-space: nowrap;
+        text-decoration: none;
+        vertical-align: baseline;
+        text-align: center;
+        margin: 0;
+        min-width: 64px;
+        line-height: 36px;
+        padding: 0 16px;
+        border-radius: 4px;
+        overflow: visible;
+        transform: translate3d(0, 0, 0);
+        transition: background .4s cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
+        min-width: 0;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        flex-shrink: 0
+    }
+
+    .mat-fab::-moz-focus-inner {
+        border: 0
+    }
+
+    .mat-fab[disabled] {
+        cursor: default
+    }
+
+    .mat-fab.cdk-keyboard-focused .mat-button-focus-overlay, .mat-fab.cdk-program-focused .mat-button-focus-overlay {
+        opacity: .12
+    }
+
+    .mat-fab::-moz-focus-inner {
+        border: 0
+    }
+
+    ._mat-animation-noopable.mat-fab {
+        transition: none;
+        animation: none
+    }
+
+    .mat-fab .mat-button-wrapper {
+        padding: 16px 0;
+        display: inline-block;
+        line-height: 24px
+    }
+
+    .mat-mini-fab {
+        box-sizing: border-box;
+        position: relative;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        outline: 0;
+        border: none;
+        -webkit-tap-highlight-color: transparent;
+        display: inline-block;
+        white-space: nowrap;
+        text-decoration: none;
+        vertical-align: baseline;
+        text-align: center;
+        margin: 0;
+        min-width: 64px;
+        line-height: 36px;
+        padding: 0 16px;
+        border-radius: 4px;
+        overflow: visible;
+        transform: translate3d(0, 0, 0);
+        transition: background .4s cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
+        min-width: 0;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        flex-shrink: 0
+    }
+
+    .mat-mini-fab::-moz-focus-inner {
+        border: 0
+    }
+
+    .mat-mini-fab[disabled] {
+        cursor: default
+    }
+
+    .mat-mini-fab.cdk-keyboard-focused .mat-button-focus-overlay, .mat-mini-fab.cdk-program-focused .mat-button-focus-overlay {
+        opacity: .12
+    }
+
+    .mat-mini-fab::-moz-focus-inner {
+        border: 0
+    }
+
+    ._mat-animation-noopable.mat-mini-fab {
+        transition: none;
+        animation: none
+    }
+
+    .mat-mini-fab .mat-button-wrapper {
+        padding: 8px 0;
+        display: inline-block;
+        line-height: 24px
+    }
+
+    .mat-icon-button {
+        padding: 0;
+        min-width: 0;
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        line-height: 40px;
+        border-radius: 50%
+    }
+
+    .mat-icon-button .mat-icon, .mat-icon-button i {
+        line-height: 24px
+    }
+
+    .mat-button-focus-overlay, .mat-button-ripple.mat-ripple {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        pointer-events: none;
+        border-radius: inherit
+    }
+
+    .mat-button-focus-overlay {
+        opacity: 0;
+        transition: opacity .2s cubic-bezier(.35, 0, .25, 1), background-color .2s cubic-bezier(.35, 0, .25, 1)
+    }
+
+    ._mat-animation-noopable .mat-button-focus-overlay {
+        transition: none
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-button-focus-overlay {
+            background-color: rgba(255, 255, 255, .5)
+        }
+    }
+
+    .mat-button-ripple-round {
+        border-radius: 50%;
+        z-index: 1
+    }
+
+    .mat-button .mat-button-wrapper > *, .mat-fab .mat-button-wrapper > *, .mat-flat-button .mat-button-wrapper > *, .mat-icon-button .mat-button-wrapper > *, .mat-mini-fab .mat-button-wrapper > *, .mat-raised-button .mat-button-wrapper > *, .mat-stroked-button .mat-button-wrapper > * {
+        vertical-align: middle
+    }
+
+    .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-prefix .mat-icon-button, .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-suffix .mat-icon-button {
+        display: block;
+        font-size: inherit;
+        width: 2.5em;
+        height: 2.5em
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-button, .mat-fab, .mat-flat-button, .mat-icon-button, .mat-mini-fab, .mat-raised-button {
+            outline: solid 1px
+        }
+    }</style>
+    <style>.mat-icon {
+        background-repeat: no-repeat;
+        display: inline-block;
+        fill: currentColor;
+        height: 24px;
+        width: 24px
+    }
+
+    .mat-icon.mat-icon-inline {
+        font-size: inherit;
+        height: inherit;
+        line-height: inherit;
+        width: inherit
+    }
+
+    [dir=rtl] .mat-icon-rtl-mirror {
+        transform: scale(-1, 1)
+    }
+
+    .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-prefix .mat-icon, .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-suffix .mat-icon {
+        display: block
+    }
+
+    .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-prefix .mat-icon-button .mat-icon, .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-suffix .mat-icon-button .mat-icon {
+        margin: auto
+    }</style>
+    <style>.mat-menu-panel {
+        min-width: 112px;
+        max-width: 280px;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        max-height: calc(100vh - 48px);
+        border-radius: 4px;
+        outline: 0
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-menu-panel {
+            outline: solid 1px
+        }
+    }
+
+    .mat-menu-content:not(:empty) {
+        padding-top: 8px;
+        padding-bottom: 8px
+    }
+
+    .mat-menu-item {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        outline: 0;
+        border: none;
+        -webkit-tap-highlight-color: transparent;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        line-height: 48px;
+        height: 48px;
+        padding: 0 16px;
+        text-align: left;
+        text-decoration: none;
+        max-width: 100%;
+        position: relative
+    }
+
+    .mat-menu-item::-moz-focus-inner {
+        border: 0
+    }
+
+    .mat-menu-item[disabled] {
+        cursor: default
+    }
+
+    [dir=rtl] .mat-menu-item {
+        text-align: right
+    }
+
+    .mat-menu-item .mat-icon {
+        margin-right: 16px;
+        vertical-align: middle
+    }
+
+    .mat-menu-item .mat-icon svg {
+        vertical-align: top
+    }
+
+    [dir=rtl] .mat-menu-item .mat-icon {
+        margin-left: 16px;
+        margin-right: 0
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-menu-item-highlighted, .mat-menu-item.cdk-keyboard-focused, .mat-menu-item.cdk-program-focused {
+            outline: dotted 1px
+        }
+    }
+
+    .mat-menu-item-submenu-trigger {
+        padding-right: 32px
+    }
+
+    .mat-menu-item-submenu-trigger::after {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 5px 0 5px 5px;
+        border-color: transparent transparent transparent currentColor;
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        transform: translateY(-50%)
+    }
+
+    [dir=rtl] .mat-menu-item-submenu-trigger {
+        padding-right: 16px;
+        padding-left: 32px
+    }
+
+    [dir=rtl] .mat-menu-item-submenu-trigger::after {
+        right: auto;
+        left: 16px;
+        transform: rotateY(180deg) translateY(-50%)
+    }
+
+    .mat-menu-panel.ng-animating .mat-menu-item-submenu-trigger {
+        pointer-events: none
+    }
+
+    button.mat-menu-item {
+        width: 100%
+    }
+
+    .mat-menu-item .mat-menu-ripple {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        pointer-events: none
+    }</style>
+    <style>.wrap[_ngcontent-c10] {
+        width: 300px;
+        position: absolute;
+        top: 15%;
+        right: 0;
+        left: 0;
+        margin: auto
+    }
+
+    .login[_ngcontent-c10] {
+        padding: 15px
+    }
+
+    button[_ngcontent-c10], mat-form-field[_ngcontent-c10] {
+        width: 100%
+    }
+
+    mat-toolbar[_ngcontent-c10] {
+        height: 50px
+    }
+
+    form[_ngcontent-c10] {
+        padding-bottom: 5px
+    }
+
+    .mat-icon[_ngcontent-c10] {
+        color: grey;
+        font-size: 20px;
+        vertical-align: middle !important;
+        margin-top: -5px
+    }</style>
+    <style>.mat-form-field {
+        display: inline-block;
+        position: relative;
+        text-align: left
+    }
+
+    [dir=rtl] .mat-form-field {
+        text-align: right
+    }
+
+    .mat-form-field-wrapper {
+        position: relative
+    }
+
+    .mat-form-field-flex {
+        display: inline-flex;
+        align-items: baseline;
+        box-sizing: border-box;
+        width: 100%
+    }
+
+    .mat-form-field-prefix, .mat-form-field-suffix {
+        white-space: nowrap;
+        flex: none;
+        position: relative
+    }
+
+    .mat-form-field-infix {
+        display: block;
+        position: relative;
+        flex: auto;
+        min-width: 0;
+        width: 180px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-infix {
+            border-image: linear-gradient(transparent, transparent)
+        }
+    }
+
+    .mat-form-field-label-wrapper {
+        position: absolute;
+        left: 0;
+        box-sizing: content-box;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none
+    }
+
+    .mat-form-field-label {
+        position: absolute;
+        left: 0;
+        font: inherit;
+        pointer-events: none;
+        width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        transform-origin: 0 0;
+        transition: transform .4s cubic-bezier(.25, .8, .25, 1), color .4s cubic-bezier(.25, .8, .25, 1), width .4s cubic-bezier(.25, .8, .25, 1);
+        display: none
+    }
+
+    [dir=rtl] .mat-form-field-label {
+        transform-origin: 100% 0;
+        left: auto;
+        right: 0
+    }
+
+    .mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label, .mat-form-field-empty.mat-form-field-label {
+        display: block
+    }
+
+    .mat-form-field-autofill-control:-webkit-autofill + .mat-form-field-label-wrapper .mat-form-field-label {
+        display: none
+    }
+
+    .mat-form-field-can-float .mat-form-field-autofill-control:-webkit-autofill + .mat-form-field-label-wrapper .mat-form-field-label {
+        display: block;
+        transition: none
+    }
+
+    .mat-input-server:focus + .mat-form-field-label-wrapper .mat-form-field-label, .mat-input-server[placeholder]:not(:placeholder-shown) + .mat-form-field-label-wrapper .mat-form-field-label {
+        display: none
+    }
+
+    .mat-form-field-can-float .mat-input-server:focus + .mat-form-field-label-wrapper .mat-form-field-label, .mat-form-field-can-float .mat-input-server[placeholder]:not(:placeholder-shown) + .mat-form-field-label-wrapper .mat-form-field-label {
+        display: block
+    }
+
+    .mat-form-field-label:not(.mat-form-field-empty) {
+        transition: none
+    }
+
+    .mat-form-field-underline {
+        position: absolute;
+        width: 100%;
+        pointer-events: none;
+        transform: scaleY(1.0001)
+    }
+
+    .mat-form-field-ripple {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        transform-origin: 50%;
+        transform: scaleX(.5);
+        opacity: 0;
+        transition: background-color .3s cubic-bezier(.55, 0, .55, .2)
+    }
+
+    .mat-form-field.mat-focused .mat-form-field-ripple, .mat-form-field.mat-form-field-invalid .mat-form-field-ripple {
+        opacity: 1;
+        transform: scaleX(1);
+        transition: transform .3s cubic-bezier(.25, .8, .25, 1), opacity .1s cubic-bezier(.25, .8, .25, 1), background-color .3s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-form-field-subscript-wrapper {
+        position: absolute;
+        box-sizing: border-box;
+        width: 100%;
+        overflow: hidden
+    }
+
+    .mat-form-field-label-wrapper .mat-icon, .mat-form-field-subscript-wrapper .mat-icon {
+        width: 1em;
+        height: 1em;
+        font-size: inherit;
+        vertical-align: baseline
+    }
+
+    .mat-form-field-hint-wrapper {
+        display: flex
+    }
+
+    .mat-form-field-hint-spacer {
+        flex: 1 0 1em
+    }
+
+    .mat-error {
+        display: block
+    }
+
+    .mat-form-field-control-wrapper {
+        position: relative
+    }
+
+    .mat-form-field._mat-animation-noopable .mat-form-field-label, .mat-form-field._mat-animation-noopable .mat-form-field-ripple {
+        transition: none
+    }</style>
+    <style>.mat-form-field-appearance-fill .mat-form-field-flex {
+        border-radius: 4px 4px 0 0;
+        padding: .75em .75em 0 .75em
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-fill .mat-form-field-flex {
+            outline: solid 1px
+        }
+    }
+
+    .mat-form-field-appearance-fill .mat-form-field-underline::before {
+        content: '';
+        display: block;
+        position: absolute;
+        bottom: 0;
+        height: 1px;
+        width: 100%
+    }
+
+    .mat-form-field-appearance-fill .mat-form-field-ripple {
+        bottom: 0;
+        height: 2px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-fill .mat-form-field-ripple {
+            height: 0;
+            border-top: solid 2px
+        }
+    }
+
+    .mat-form-field-appearance-fill:not(.mat-form-field-disabled) .mat-form-field-flex:hover ~ .mat-form-field-underline .mat-form-field-ripple {
+        opacity: 1;
+        transform: none;
+        transition: opacity .6s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-form-field-appearance-fill._mat-animation-noopable:not(.mat-form-field-disabled) .mat-form-field-flex:hover ~ .mat-form-field-underline .mat-form-field-ripple {
+        transition: none
+    }
+
+    .mat-form-field-appearance-fill .mat-form-field-subscript-wrapper {
+        padding: 0 1em
+    }</style>
+    <style>.mat-form-field-appearance-legacy .mat-form-field-label {
+        transform: perspective(100px);
+        -ms-transform: none
+    }
+
+    .mat-form-field-appearance-legacy .mat-form-field-prefix .mat-icon, .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-icon {
+        width: 1em
+    }
+
+    .mat-form-field-appearance-legacy .mat-form-field-prefix .mat-icon-button, .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-icon-button {
+        font: inherit;
+        vertical-align: baseline
+    }
+
+    .mat-form-field-appearance-legacy .mat-form-field-prefix .mat-icon-button .mat-icon, .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-icon-button .mat-icon {
+        font-size: inherit
+    }
+
+    .mat-form-field-appearance-legacy .mat-form-field-underline {
+        height: 1px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-legacy .mat-form-field-underline {
+            height: 0;
+            border-top: solid 1px
+        }
+    }
+
+    .mat-form-field-appearance-legacy .mat-form-field-ripple {
+        top: 0;
+        height: 2px;
+        overflow: hidden
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-legacy .mat-form-field-ripple {
+            height: 0;
+            border-top: solid 2px
+        }
+    }
+
+    .mat-form-field-appearance-legacy.mat-form-field-disabled .mat-form-field-underline {
+        background-position: 0;
+        background-color: transparent
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-legacy.mat-form-field-disabled .mat-form-field-underline {
+            border-top-style: dotted;
+            border-top-width: 2px
+        }
+    }
+
+    .mat-form-field-appearance-legacy.mat-form-field-invalid:not(.mat-focused) .mat-form-field-ripple {
+        height: 1px
+    }</style>
+    <style>.mat-form-field-appearance-outline .mat-form-field-wrapper {
+        margin: .25em 0
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-flex {
+        padding: 0 .75em 0 .75em;
+        margin-top: -.25em;
+        position: relative
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-prefix, .mat-form-field-appearance-outline .mat-form-field-suffix {
+        top: .25em
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline {
+        display: flex;
+        position: absolute;
+        top: .25em;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline-end, .mat-form-field-appearance-outline .mat-form-field-outline-start {
+        border: 1px solid currentColor;
+        min-width: 5px
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline-start {
+        border-radius: 5px 0 0 5px;
+        border-right-style: none
+    }
+
+    [dir=rtl] .mat-form-field-appearance-outline .mat-form-field-outline-start {
+        border-right-style: solid;
+        border-left-style: none;
+        border-radius: 0 5px 5px 0
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline-end {
+        border-radius: 0 5px 5px 0;
+        border-left-style: none;
+        flex-grow: 1
+    }
+
+    [dir=rtl] .mat-form-field-appearance-outline .mat-form-field-outline-end {
+        border-left-style: solid;
+        border-right-style: none;
+        border-radius: 5px 0 0 5px
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline-gap {
+        border-radius: .000001px;
+        border: 1px solid currentColor;
+        border-left-style: none;
+        border-right-style: none
+    }
+
+    .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-outline-gap {
+        border-top-color: transparent
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline-thick {
+        opacity: 0
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline-thick .mat-form-field-outline-end, .mat-form-field-appearance-outline .mat-form-field-outline-thick .mat-form-field-outline-gap, .mat-form-field-appearance-outline .mat-form-field-outline-thick .mat-form-field-outline-start {
+        border-width: 2px;
+        transition: border-color .3s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline, .mat-form-field-appearance-outline.mat-form-field-invalid .mat-form-field-outline {
+        opacity: 0;
+        transition: opacity .1s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick, .mat-form-field-appearance-outline.mat-form-field-invalid .mat-form-field-outline-thick {
+        opacity: 1
+    }
+
+    .mat-form-field-appearance-outline:not(.mat-form-field-disabled) .mat-form-field-flex:hover .mat-form-field-outline {
+        opacity: 0;
+        transition: opacity .6s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-form-field-appearance-outline:not(.mat-form-field-disabled) .mat-form-field-flex:hover .mat-form-field-outline-thick {
+        opacity: 1
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-subscript-wrapper {
+        padding: 0 1em
+    }
+
+    .mat-form-field-appearance-outline._mat-animation-noopable .mat-form-field-outline, .mat-form-field-appearance-outline._mat-animation-noopable .mat-form-field-outline-end, .mat-form-field-appearance-outline._mat-animation-noopable .mat-form-field-outline-gap, .mat-form-field-appearance-outline._mat-animation-noopable .mat-form-field-outline-start, .mat-form-field-appearance-outline._mat-animation-noopable:not(.mat-form-field-disabled) .mat-form-field-flex:hover ~ .mat-form-field-outline {
+        transition: none
+    }</style>
+    <style>.mat-form-field-appearance-standard .mat-form-field-flex {
+        padding-top: .75em
+    }
+
+    .mat-form-field-appearance-standard .mat-form-field-underline {
+        height: 1px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-standard .mat-form-field-underline {
+            height: 0;
+            border-top: solid 1px
+        }
+    }
+
+    .mat-form-field-appearance-standard .mat-form-field-ripple {
+        bottom: 0;
+        height: 2px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-standard .mat-form-field-ripple {
+            height: 0;
+            border-top: 2px
+        }
+    }
+
+    .mat-form-field-appearance-standard.mat-form-field-disabled .mat-form-field-underline {
+        background-position: 0;
+        background-color: transparent
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-form-field-appearance-standard.mat-form-field-disabled .mat-form-field-underline {
+            border-top-style: dotted;
+            border-top-width: 2px
+        }
+    }
+
+    .mat-form-field-appearance-standard:not(.mat-form-field-disabled) .mat-form-field-flex:hover ~ .mat-form-field-underline .mat-form-field-ripple {
+        opacity: 1;
+        transform: none;
+        transition: opacity .6s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-form-field-appearance-standard._mat-animation-noopable:not(.mat-form-field-disabled) .mat-form-field-flex:hover ~ .mat-form-field-underline .mat-form-field-ripple {
+        transition: none
+    }</style>
+    <style>.mat-input-element {
+        font: inherit;
+        background: 0 0;
+        color: currentColor;
+        border: none;
+        outline: 0;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        vertical-align: bottom;
+        text-align: inherit
+    }
+
+    .mat-input-element:-moz-ui-invalid {
+        box-shadow: none
+    }
+
+    .mat-input-element::-ms-clear, .mat-input-element::-ms-reveal {
+        display: none
+    }
+
+    .mat-input-element, .mat-input-element::-webkit-search-cancel-button, .mat-input-element::-webkit-search-decoration, .mat-input-element::-webkit-search-results-button, .mat-input-element::-webkit-search-results-decoration {
+        -webkit-appearance: none
+    }
+
+    .mat-input-element::-webkit-caps-lock-indicator, .mat-input-element::-webkit-contacts-auto-fill-button, .mat-input-element::-webkit-credentials-auto-fill-button {
+        visibility: hidden
+    }
+
+    .mat-input-element[type=date]::after, .mat-input-element[type=datetime-local]::after, .mat-input-element[type=datetime]::after, .mat-input-element[type=month]::after, .mat-input-element[type=time]::after, .mat-input-element[type=week]::after {
+        content: ' ';
+        white-space: pre;
+        width: 1px
+    }
+
+    .mat-input-element::-webkit-calendar-picker-indicator, .mat-input-element::-webkit-clear-button, .mat-input-element::-webkit-inner-spin-button {
+        font-size: .75em
+    }
+
+    .mat-input-element::placeholder {
+        transition: color .4s .133s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-input-element::-moz-placeholder {
+        transition: color .4s .133s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-input-element::-webkit-input-placeholder {
+        transition: color .4s .133s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-input-element:-ms-input-placeholder {
+        transition: color .4s .133s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    .mat-form-field-hide-placeholder .mat-input-element::placeholder {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        transition: none
+    }
+
+    .mat-form-field-hide-placeholder .mat-input-element::-moz-placeholder {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        transition: none
+    }
+
+    .mat-form-field-hide-placeholder .mat-input-element::-webkit-input-placeholder {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        transition: none
+    }
+
+    .mat-form-field-hide-placeholder .mat-input-element:-ms-input-placeholder {
+        color: transparent !important;
+        -webkit-text-fill-color: transparent;
+        transition: none
+    }
+
+    textarea.mat-input-element {
+        resize: vertical;
+        overflow: auto
+    }
+
+    textarea.mat-input-element.cdk-textarea-autosize {
+        resize: none
+    }
+
+    textarea.mat-input-element {
+        padding: 2px 0;
+        margin: -2px 0
+    }
+
+    select.mat-input-element {
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        position: relative;
+        background-color: transparent;
+        display: inline-flex;
+        box-sizing: border-box;
+        padding-top: 1em;
+        top: -1em;
+        margin-bottom: -1em
+    }
+
+    select.mat-input-element::-ms-expand {
+        display: none
+    }
+
+    select.mat-input-element::-moz-focus-inner {
+        border: 0
+    }
+
+    select.mat-input-element:not(:disabled) {
+        cursor: pointer
+    }
+
+    select.mat-input-element::-ms-value {
+        color: inherit;
+        background: 0 0
+    }
+
+    .mat-form-field-type-mat-native-select .mat-form-field-infix::after {
+        content: '';
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid;
+        position: absolute;
+        top: 50%;
+        right: 0;
+        margin-top: -2.5px
+    }
+
+    [dir=rtl] .mat-form-field-type-mat-native-select .mat-form-field-infix::after {
+        right: auto;
+        left: 0
+    }
+
+    .mat-form-field-type-mat-native-select.mat-form-field-appearance-outline .mat-form-field-infix::after {
+        margin-top: -5px
+    }
+
+    .mat-form-field-type-mat-native-select.mat-form-field-appearance-fill .mat-form-field-infix::after {
+        margin-top: -10px
+    }</style>
+    <style>@keyframes mat-checkbox-fade-in-background {
+               0% {
+                   opacity: 0
+               }
+               50% {
+                   opacity: 1
+               }
+           }
+
+    @keyframes mat-checkbox-fade-out-background {
+        0%, 50% {
+            opacity: 1
+        }
+        100% {
+            opacity: 0
+        }
+    }
+
+    @keyframes mat-checkbox-unchecked-checked-checkmark-path {
+        0%, 50% {
+            stroke-dashoffset: 22.91026
+        }
+        50% {
+            animation-timing-function: cubic-bezier(0, 0, .2, .1)
+        }
+        100% {
+            stroke-dashoffset: 0
+        }
+    }
+
+    @keyframes mat-checkbox-unchecked-indeterminate-mixedmark {
+        0%, 68.2% {
+            transform: scaleX(0)
+        }
+        68.2% {
+            animation-timing-function: cubic-bezier(0, 0, 0, 1)
+        }
+        100% {
+            transform: scaleX(1)
+        }
+    }
+
+    @keyframes mat-checkbox-checked-unchecked-checkmark-path {
+        from {
+            animation-timing-function: cubic-bezier(.4, 0, 1, 1);
+            stroke-dashoffset: 0
+        }
+        to {
+            stroke-dashoffset: -22.91026
+        }
+    }
+
+    @keyframes mat-checkbox-checked-indeterminate-checkmark {
+        from {
+            animation-timing-function: cubic-bezier(0, 0, .2, .1);
+            opacity: 1;
+            transform: rotate(0)
+        }
+        to {
+            opacity: 0;
+            transform: rotate(45deg)
+        }
+    }
+
+    @keyframes mat-checkbox-indeterminate-checked-checkmark {
+        from {
+            animation-timing-function: cubic-bezier(.14, 0, 0, 1);
+            opacity: 0;
+            transform: rotate(45deg)
+        }
+        to {
+            opacity: 1;
+            transform: rotate(360deg)
+        }
+    }
+
+    @keyframes mat-checkbox-checked-indeterminate-mixedmark {
+        from {
+            animation-timing-function: cubic-bezier(0, 0, .2, .1);
+            opacity: 0;
+            transform: rotate(-45deg)
+        }
+        to {
+            opacity: 1;
+            transform: rotate(0)
+        }
+    }
+
+    @keyframes mat-checkbox-indeterminate-checked-mixedmark {
+        from {
+            animation-timing-function: cubic-bezier(.14, 0, 0, 1);
+            opacity: 1;
+            transform: rotate(0)
+        }
+        to {
+            opacity: 0;
+            transform: rotate(315deg)
+        }
+    }
+
+    @keyframes mat-checkbox-indeterminate-unchecked-mixedmark {
+        0% {
+            animation-timing-function: linear;
+            opacity: 1;
+            transform: scaleX(1)
+        }
+        100%, 32.8% {
+            opacity: 0;
+            transform: scaleX(0)
+        }
+    }
+
+    .mat-checkbox-background, .mat-checkbox-frame {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        border-radius: 2px;
+        box-sizing: border-box;
+        pointer-events: none
+    }
+
+    .mat-checkbox {
+        transition: background .4s cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent
+    }
+
+    ._mat-animation-noopable.mat-checkbox {
+        transition: none;
+        animation: none
+    }
+
+    .mat-checkbox .mat-ripple-element:not(.mat-checkbox-persistent-ripple) {
+        opacity: .16
+    }
+
+    .mat-checkbox-layout {
+        cursor: inherit;
+        align-items: baseline;
+        vertical-align: middle;
+        display: inline-flex;
+        white-space: nowrap
+    }
+
+    .mat-checkbox-inner-container {
+        display: inline-block;
+        height: 16px;
+        line-height: 0;
+        margin: auto;
+        margin-right: 8px;
+        order: 0;
+        position: relative;
+        vertical-align: middle;
+        white-space: nowrap;
+        width: 16px;
+        flex-shrink: 0
+    }
+
+    [dir=rtl] .mat-checkbox-inner-container {
+        margin-left: 8px;
+        margin-right: auto
+    }
+
+    .mat-checkbox-inner-container-no-side-margin {
+        margin-left: 0;
+        margin-right: 0
+    }
+
+    .mat-checkbox-frame {
+        background-color: transparent;
+        transition: border-color 90ms cubic-bezier(0, 0, .2, .1);
+        border-width: 2px;
+        border-style: solid
+    }
+
+    ._mat-animation-noopable .mat-checkbox-frame {
+        transition: none
+    }
+
+    .mat-checkbox-background {
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        transition: background-color 90ms cubic-bezier(0, 0, .2, .1), opacity 90ms cubic-bezier(0, 0, .2, .1)
+    }
+
+    ._mat-animation-noopable .mat-checkbox-background {
+        transition: none
+    }
+
+    .mat-checkbox-persistent-ripple {
+        width: 100%;
+        height: 100%;
+        transform: none
+    }
+
+    .mat-checkbox-inner-container:hover .mat-checkbox-persistent-ripple {
+        opacity: .04
+    }
+
+    .mat-checkbox.cdk-keyboard-focused .mat-checkbox-persistent-ripple {
+        opacity: .12
+    }
+
+    .mat-checkbox-persistent-ripple, .mat-checkbox.mat-disabled .mat-checkbox-inner-container:hover .mat-checkbox-persistent-ripple {
+        opacity: 0
+    }
+
+    .mat-checkbox-checkmark {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        width: 100%
+    }
+
+    .mat-checkbox-checkmark-path {
+        stroke-dashoffset: 22.91026;
+        stroke-dasharray: 22.91026;
+        stroke-width: 2.13333px
+    }
+
+    .mat-checkbox-mixedmark {
+        width: calc(100% - 6px);
+        height: 2px;
+        opacity: 0;
+        transform: scaleX(0) rotate(0);
+        border-radius: 2px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-checkbox-mixedmark {
+            height: 0;
+            border-top: solid 2px;
+            margin-top: 2px
+        }
+    }
+
+    .mat-checkbox-label-before .mat-checkbox-inner-container {
+        order: 1;
+        margin-left: 8px;
+        margin-right: auto
+    }
+
+    [dir=rtl] .mat-checkbox-label-before .mat-checkbox-inner-container {
+        margin-left: auto;
+        margin-right: 8px
+    }
+
+    .mat-checkbox-checked .mat-checkbox-checkmark {
+        opacity: 1
+    }
+
+    .mat-checkbox-checked .mat-checkbox-checkmark-path {
+        stroke-dashoffset: 0
+    }
+
+    .mat-checkbox-checked .mat-checkbox-mixedmark {
+        transform: scaleX(1) rotate(-45deg)
+    }
+
+    .mat-checkbox-indeterminate .mat-checkbox-checkmark {
+        opacity: 0;
+        transform: rotate(45deg)
+    }
+
+    .mat-checkbox-indeterminate .mat-checkbox-checkmark-path {
+        stroke-dashoffset: 0
+    }
+
+    .mat-checkbox-indeterminate .mat-checkbox-mixedmark {
+        opacity: 1;
+        transform: scaleX(1) rotate(0)
+    }
+
+    .mat-checkbox-indeterminate.mat-checkbox-disabled .mat-checkbox-inner-container {
+        opacity: .5
+    }
+
+    .mat-checkbox-unchecked .mat-checkbox-background {
+        background-color: transparent
+    }
+
+    .mat-checkbox-disabled {
+        cursor: default
+    }
+
+    .mat-checkbox-anim-unchecked-checked .mat-checkbox-background {
+        animation: 180ms linear 0s mat-checkbox-fade-in-background
+    }
+
+    .mat-checkbox-anim-unchecked-checked .mat-checkbox-checkmark-path {
+        animation: 180ms linear 0s mat-checkbox-unchecked-checked-checkmark-path
+    }
+
+    .mat-checkbox-anim-unchecked-indeterminate .mat-checkbox-background {
+        animation: 180ms linear 0s mat-checkbox-fade-in-background
+    }
+
+    .mat-checkbox-anim-unchecked-indeterminate .mat-checkbox-mixedmark {
+        animation: 90ms linear 0s mat-checkbox-unchecked-indeterminate-mixedmark
+    }
+
+    .mat-checkbox-anim-checked-unchecked .mat-checkbox-background {
+        animation: 180ms linear 0s mat-checkbox-fade-out-background
+    }
+
+    .mat-checkbox-anim-checked-unchecked .mat-checkbox-checkmark-path {
+        animation: 90ms linear 0s mat-checkbox-checked-unchecked-checkmark-path
+    }
+
+    .mat-checkbox-anim-checked-indeterminate .mat-checkbox-checkmark {
+        animation: 90ms linear 0s mat-checkbox-checked-indeterminate-checkmark
+    }
+
+    .mat-checkbox-anim-checked-indeterminate .mat-checkbox-mixedmark {
+        animation: 90ms linear 0s mat-checkbox-checked-indeterminate-mixedmark
+    }
+
+    .mat-checkbox-anim-indeterminate-checked .mat-checkbox-checkmark {
+        animation: .5s linear 0s mat-checkbox-indeterminate-checked-checkmark
+    }
+
+    .mat-checkbox-anim-indeterminate-checked .mat-checkbox-mixedmark {
+        animation: .5s linear 0s mat-checkbox-indeterminate-checked-mixedmark
+    }
+
+    .mat-checkbox-anim-indeterminate-unchecked .mat-checkbox-background {
+        animation: 180ms linear 0s mat-checkbox-fade-out-background
+    }
+
+    .mat-checkbox-anim-indeterminate-unchecked .mat-checkbox-mixedmark {
+        animation: .3s linear 0s mat-checkbox-indeterminate-unchecked-mixedmark
+    }
+
+    .mat-checkbox-input {
+        bottom: 0;
+        left: 50%
+    }
+
+    .mat-checkbox .mat-checkbox-ripple {
+        position: absolute;
+        left: calc(50% - 20px);
+        top: calc(50% - 20px);
+        height: 40px;
+        width: 40px;
+        z-index: 1;
+        pointer-events: none
+    }</style>
+    <script charset="utf-8" src="common.eaef930146f07aac92ae.js"></script>
+    <script charset="utf-8" src="13.5ec570c8f4f5b2bf9f73.js"></script>
+    <style>.loading-shade[_ngcontent-c13] {
+        padding: 50px 20px 0
+    }</style>
+    <style>mat-table {
+        display: block
+    }
+
+    mat-header-row {
+        min-height: 56px
+    }
+
+    mat-footer-row, mat-row {
+        min-height: 48px
+    }
+
+    mat-footer-row, mat-header-row, mat-row {
+        display: flex;
+        border-width: 0;
+        border-bottom-width: 1px;
+        border-style: solid;
+        align-items: center;
+        box-sizing: border-box
+    }
+
+    mat-footer-row::after, mat-header-row::after, mat-row::after {
+        display: inline-block;
+        min-height: inherit;
+        content: ''
+    }
+
+    mat-cell:first-of-type, mat-footer-cell:first-of-type, mat-header-cell:first-of-type {
+        padding-left: 24px
+    }
+
+    [dir=rtl] mat-cell:first-of-type, [dir=rtl] mat-footer-cell:first-of-type, [dir=rtl] mat-header-cell:first-of-type {
+        padding-left: 0;
+        padding-right: 24px
+    }
+
+    mat-cell:last-of-type, mat-footer-cell:last-of-type, mat-header-cell:last-of-type {
+        padding-right: 24px
+    }
+
+    [dir=rtl] mat-cell:last-of-type, [dir=rtl] mat-footer-cell:last-of-type, [dir=rtl] mat-header-cell:last-of-type {
+        padding-right: 0;
+        padding-left: 24px
+    }
+
+    mat-cell, mat-footer-cell, mat-header-cell {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        word-wrap: break-word;
+        min-height: inherit
+    }
+
+    table.mat-table {
+        border-spacing: 0
+    }
+
+    tr.mat-header-row {
+        height: 56px
+    }
+
+    tr.mat-footer-row, tr.mat-row {
+        height: 48px
+    }
+
+    th.mat-header-cell {
+        text-align: left
+    }
+
+    [dir=rtl] th.mat-header-cell {
+        text-align: right
+    }
+
+    td.mat-cell, td.mat-footer-cell, th.mat-header-cell {
+        padding: 0;
+        border-bottom-width: 1px;
+        border-bottom-style: solid
+    }
+
+    td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type, th.mat-header-cell:first-of-type {
+        padding-left: 24px
+    }
+
+    [dir=rtl] td.mat-cell:first-of-type, [dir=rtl] td.mat-footer-cell:first-of-type, [dir=rtl] th.mat-header-cell:first-of-type {
+        padding-left: 0;
+        padding-right: 24px
+    }
+
+    td.mat-cell:last-of-type, td.mat-footer-cell:last-of-type, th.mat-header-cell:last-of-type {
+        padding-right: 24px
+    }
+
+    [dir=rtl] td.mat-cell:last-of-type, [dir=rtl] td.mat-footer-cell:last-of-type, [dir=rtl] th.mat-header-cell:last-of-type {
+        padding-right: 0;
+        padding-left: 24px
+    }</style>
+    <style>.mat-progress-spinner {
+        display: block;
+        position: relative
+    }
+
+    .mat-progress-spinner svg {
+        position: absolute;
+        transform: rotate(-90deg);
+        top: 0;
+        left: 0;
+        transform-origin: center;
+        overflow: visible
+    }
+
+    .mat-progress-spinner circle {
+        fill: transparent;
+        transform-origin: center;
+        transition: stroke-dashoffset 225ms linear
+    }
+
+    ._mat-animation-noopable.mat-progress-spinner circle {
+        transition: none;
+        animation: none
+    }
+
+    .mat-progress-spinner.mat-progress-spinner-indeterminate-animation[mode=indeterminate] {
+        animation: mat-progress-spinner-linear-rotate 2s linear infinite
+    }
+
+    ._mat-animation-noopable.mat-progress-spinner.mat-progress-spinner-indeterminate-animation[mode=indeterminate] {
+        transition: none;
+        animation: none
+    }
+
+    .mat-progress-spinner.mat-progress-spinner-indeterminate-animation[mode=indeterminate] circle {
+        transition-property: stroke;
+        animation-duration: 4s;
+        animation-timing-function: cubic-bezier(.35, 0, .25, 1);
+        animation-iteration-count: infinite
+    }
+
+    ._mat-animation-noopable.mat-progress-spinner.mat-progress-spinner-indeterminate-animation[mode=indeterminate] circle {
+        transition: none;
+        animation: none
+    }
+
+    .mat-progress-spinner.mat-progress-spinner-indeterminate-fallback-animation[mode=indeterminate] {
+        animation: mat-progress-spinner-stroke-rotate-fallback 10s cubic-bezier(.87, .03, .33, 1) infinite
+    }
+
+    ._mat-animation-noopable.mat-progress-spinner.mat-progress-spinner-indeterminate-fallback-animation[mode=indeterminate] {
+        transition: none;
+        animation: none
+    }
+
+    .mat-progress-spinner.mat-progress-spinner-indeterminate-fallback-animation[mode=indeterminate] circle {
+        transition-property: stroke
+    }
+
+    ._mat-animation-noopable.mat-progress-spinner.mat-progress-spinner-indeterminate-fallback-animation[mode=indeterminate] circle {
+        transition: none;
+        animation: none
+    }
+
+    @keyframes mat-progress-spinner-linear-rotate {
+        0% {
+            transform: rotate(0)
+        }
+        100% {
+            transform: rotate(360deg)
+        }
+    }
+
+    @keyframes mat-progress-spinner-stroke-rotate-100 {
+        0% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotate(0)
+        }
+        12.5% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotate(0)
+        }
+        12.5001% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotateX(180deg) rotate(72.5deg)
+        }
+        25% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotateX(180deg) rotate(72.5deg)
+        }
+        25.0001% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotate(270deg)
+        }
+        37.5% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotate(270deg)
+        }
+        37.5001% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotateX(180deg) rotate(161.5deg)
+        }
+        50% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotateX(180deg) rotate(161.5deg)
+        }
+        50.0001% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotate(180deg)
+        }
+        62.5% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotate(180deg)
+        }
+        62.5001% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotateX(180deg) rotate(251.5deg)
+        }
+        75% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotateX(180deg) rotate(251.5deg)
+        }
+        75.0001% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotate(90deg)
+        }
+        87.5% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotate(90deg)
+        }
+        87.5001% {
+            stroke-dashoffset: 56.54867px;
+            transform: rotateX(180deg) rotate(341.5deg)
+        }
+        100% {
+            stroke-dashoffset: 268.60617px;
+            transform: rotateX(180deg) rotate(341.5deg)
+        }
+    }
+
+    @keyframes mat-progress-spinner-stroke-rotate-fallback {
+        0% {
+            transform: rotate(0)
+        }
+        25% {
+            transform: rotate(1170deg)
+        }
+        50% {
+            transform: rotate(2340deg)
+        }
+        75% {
+            transform: rotate(3510deg)
+        }
+        100% {
+            transform: rotate(4680deg)
+        }
+    }</style>
+    <script charset="utf-8" src="1.cb97584cf159e8ebd344.js"></script>
+    <script charset="utf-8" src="2.5faaa019fa0b130e2027.js"></script>
+    <script charset="utf-8" src="3.80e03fec44c91e312334.js"></script>
+    <script charset="utf-8" src="10.a68b66500d61d736f5bd.js"></script>
+    <style>.loading-shade[_ngcontent-c16] {
+        background: rgba(0, 0, 0, .15)
+    }
+
+    .no-shade-background[_ngcontent-c16] {
+        background: 0 0 !important
+    }
+
+    .mat-column-calldate[_ngcontent-c16] {
+        flex: 1 1 140px
+    }
+
+    .mat-column-direction[_ngcontent-c16] {
+        flex: 1 1 15px
+    }
+
+    .mat-column-inf[_ngcontent-c16] {
+        flex: 1 1 100px
+    }
+
+    .mat-column-result[_ngcontent-c16] {
+        flex: 1 1 120px
+    }
+
+    .mat-column-did[_ngcontent-c16] {
+        flex: 1 1 100px
+    }
+
+    .mat-column-holdtime[_ngcontent-c16], .mat-column-talktime[_ngcontent-c16] {
+        flex: 1 1 80px
+    }
+
+    .mat-column-dnum[_ngcontent-c16], .mat-column-snum[_ngcontent-c16] {
+        flex: 1 1 150px
+    }
+
+    .mat-column-transfer[_ngcontent-c16] {
+        flex: 1 1 125px
+    }
+
+    .mat-column-actions[_ngcontent-c16] {
+        flex: 1 1 80px
+    }
+
+    .mat-column-actions[_ngcontent-c16] .mat-icon-button[_ngcontent-c16], .mat-column-transfer[_ngcontent-c16] .mat-icon-button[_ngcontent-c16] {
+        width: 24px;
+        height: 24px;
+        line-height: 24px
+    }</style>
+    <style>.mat-paginator {
+        display: block
+    }
+
+    .mat-paginator-outer-container {
+        display: flex
+    }
+
+    .mat-paginator-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        min-height: 56px;
+        padding: 0 8px;
+        flex-wrap: wrap-reverse;
+        width: 100%
+    }
+
+    .mat-paginator-page-size {
+        display: flex;
+        align-items: baseline;
+        margin-right: 8px
+    }
+
+    [dir=rtl] .mat-paginator-page-size {
+        margin-right: 0;
+        margin-left: 8px
+    }
+
+    .mat-paginator-page-size-label {
+        margin: 0 4px
+    }
+
+    .mat-paginator-page-size-select {
+        margin: 6px 4px 0 4px;
+        width: 56px
+    }
+
+    .mat-paginator-page-size-select.mat-form-field-appearance-outline {
+        width: 64px
+    }
+
+    .mat-paginator-page-size-select.mat-form-field-appearance-fill {
+        width: 64px
+    }
+
+    .mat-paginator-range-label {
+        margin: 0 32px 0 24px
+    }
+
+    .mat-paginator-range-actions {
+        display: flex;
+        align-items: center
+    }
+
+    .mat-paginator-icon {
+        width: 28px;
+        fill: currentColor
+    }
+
+    [dir=rtl] .mat-paginator-icon {
+        transform: rotate(180deg)
+    }</style>
+    <style>.mat-select {
+        display: inline-block;
+        width: 100%;
+        outline: 0
+    }
+
+    .mat-select-trigger {
+        display: inline-table;
+        cursor: pointer;
+        position: relative;
+        box-sizing: border-box
+    }
+
+    .mat-select-disabled .mat-select-trigger {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: default
+    }
+
+    .mat-select-value {
+        display: table-cell;
+        max-width: 0;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+    }
+
+    .mat-select-value-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis
+    }
+
+    .mat-select-arrow-wrapper {
+        display: table-cell;
+        vertical-align: middle
+    }
+
+    .mat-form-field-appearance-fill .mat-select-arrow-wrapper {
+        transform: translateY(-50%)
+    }
+
+    .mat-form-field-appearance-outline .mat-select-arrow-wrapper {
+        transform: translateY(-25%)
+    }
+
+    .mat-form-field-appearance-standard .mat-select:not(.mat-select-empty) .mat-select-arrow-wrapper {
+        transform: translateY(-50%)
+    }
+
+    .mat-form-field-appearance-standard .mat-select.mat-select-empty .mat-select-arrow-wrapper {
+        transition: transform .4s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    ._mat-animation-noopable.mat-form-field-appearance-standard .mat-select.mat-select-empty .mat-select-arrow-wrapper {
+        transition: none
+    }
+
+    .mat-select-arrow {
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid;
+        margin: 0 4px
+    }
+
+    .mat-select-panel {
+        min-width: 112px;
+        max-width: 280px;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-top: 0;
+        padding-bottom: 0;
+        max-height: 256px;
+        min-width: 100%;
+        border-radius: 4px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-select-panel {
+            outline: solid 1px
+        }
+    }
+
+    .mat-select-panel .mat-optgroup-label, .mat-select-panel .mat-option {
+        font-size: inherit;
+        line-height: 3em;
+        height: 3em
+    }
+
+    .mat-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-form-field-flex {
+        cursor: pointer
+    }
+
+    .mat-form-field-type-mat-select .mat-form-field-label {
+        width: calc(100% - 18px)
+    }
+
+    .mat-select-placeholder {
+        transition: color .4s .133s cubic-bezier(.25, .8, .25, 1)
+    }
+
+    ._mat-animation-noopable .mat-select-placeholder {
+        transition: none
+    }
+
+    .mat-form-field-hide-placeholder .mat-select-placeholder {
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        transition: none;
+        display: block
+    }</style>
+    <style>.mat-option {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        line-height: 48px;
+        height: 48px;
+        padding: 0 16px;
+        text-align: left;
+        text-decoration: none;
+        max-width: 100%;
+        position: relative;
+        cursor: pointer;
+        outline: 0;
+        display: flex;
+        flex-direction: row;
+        max-width: 100%;
+        box-sizing: border-box;
+        align-items: center;
+        -webkit-tap-highlight-color: transparent
+    }
+
+    .mat-option[disabled] {
+        cursor: default
+    }
+
+    [dir=rtl] .mat-option {
+        text-align: right
+    }
+
+    .mat-option .mat-icon {
+        margin-right: 16px;
+        vertical-align: middle
+    }
+
+    .mat-option .mat-icon svg {
+        vertical-align: top
+    }
+
+    [dir=rtl] .mat-option .mat-icon {
+        margin-left: 16px;
+        margin-right: 0
+    }
+
+    .mat-option[aria-disabled=true] {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: default
+    }
+
+    .mat-optgroup .mat-option:not(.mat-option-multiple) {
+        padding-left: 32px
+    }
+
+    [dir=rtl] .mat-optgroup .mat-option:not(.mat-option-multiple) {
+        padding-left: 16px;
+        padding-right: 32px
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-option {
+            margin: 0 1px
+        }
+
+        .mat-option.mat-active {
+            border: solid 1px currentColor;
+            margin: 0
+        }
+    }
+
+    .mat-option-text {
+        display: inline-block;
+        flex-grow: 1;
+        overflow: hidden;
+        text-overflow: ellipsis
+    }
+
+    .mat-option .mat-option-ripple {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        pointer-events: none
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-option .mat-option-ripple {
+            opacity: .5
+        }
+    }
+
+    .mat-option-pseudo-checkbox {
+        margin-right: 8px
+    }
+
+    [dir=rtl] .mat-option-pseudo-checkbox {
+        margin-left: 8px;
+        margin-right: 0
+    }</style>
+    <style>.mat-tooltip-panel {
+        pointer-events: none !important
+    }
+
+    .mat-tooltip {
+        color: #fff;
+        border-radius: 4px;
+        margin: 14px;
+        max-width: 250px;
+        padding-left: 8px;
+        padding-right: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-tooltip {
+            outline: solid 1px
+        }
+    }
+
+    .mat-tooltip-handset {
+        margin: 24px;
+        padding-left: 16px;
+        padding-right: 16px
+    }</style>
+    <style>.mat-dialog-container {
+        display: block;
+        padding: 24px;
+        border-radius: 4px;
+        box-sizing: border-box;
+        overflow: auto;
+        outline: 0;
+        width: 100%;
+        height: 100%;
+        min-height: inherit;
+        max-height: inherit
+    }
+
+    @media screen and (-ms-high-contrast: active) {
+        .mat-dialog-container {
+            outline: solid 1px
+        }
+    }
+
+    .mat-dialog-content {
+        display: block;
+        margin: 0 -24px;
+        padding: 0 24px;
+        max-height: 65vh;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch
+    }
+
+    .mat-dialog-title {
+        margin: 0 0 20px;
+        display: block
+    }
+
+    .mat-dialog-actions {
+        padding: 8px 0;
+        display: flex;
+        flex-wrap: wrap;
+        min-height: 52px;
+        align-items: center;
+        margin-bottom: -24px
+    }
+
+    .mat-dialog-actions[align=end] {
+        justify-content: flex-end
+    }
+
+    .mat-dialog-actions[align=center] {
+        justify-content: center
+    }
+
+    .mat-dialog-actions .mat-button + .mat-button, .mat-dialog-actions .mat-button + .mat-raised-button, .mat-dialog-actions .mat-raised-button + .mat-button, .mat-dialog-actions .mat-raised-button + .mat-raised-button {
+        margin-left: 8px
+    }
+
+    [dir=rtl] .mat-dialog-actions .mat-button + .mat-button, [dir=rtl] .mat-dialog-actions .mat-button + .mat-raised-button, [dir=rtl] .mat-dialog-actions .mat-raised-button + .mat-button, [dir=rtl] .mat-dialog-actions .mat-raised-button + .mat-raised-button {
+        margin-left: 0;
+        margin-right: 8px
+    }</style>
+    <style>.dateField[_ngcontent-c24], .timeField[_ngcontent-c24] {
+        text-align: center
+    }</style>
+    <style>.mat-form-field-appearance-legacy .mat-form-field-prefix .mat-datepicker-toggle-default-icon, .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-datepicker-toggle-default-icon {
+        width: 1em
+    }
+
+    .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-prefix .mat-datepicker-toggle-default-icon, .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-suffix .mat-datepicker-toggle-default-icon {
+        display: block;
+        width: 1.5em;
+        height: 1.5em
+    }
+
+    .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-prefix .mat-icon-button .mat-datepicker-toggle-default-icon, .mat-form-field:not(.mat-form-field-appearance-legacy) .mat-form-field-suffix .mat-icon-button .mat-datepicker-toggle-default-icon {
+        margin: auto
+    }</style>
+    <style>.mat-pseudo-checkbox {
+        width: 16px;
+        height: 16px;
+        border: 2px solid;
+        border-radius: 2px;
+        cursor: pointer;
+        display: inline-block;
+        vertical-align: middle;
+        box-sizing: border-box;
+        position: relative;
+        flex-shrink: 0;
+        transition: border-color 90ms cubic-bezier(0, 0, .2, .1), background-color 90ms cubic-bezier(0, 0, .2, .1)
+    }
+
+    .mat-pseudo-checkbox::after {
+        position: absolute;
+        opacity: 0;
+        content: '';
+        border-bottom: 2px solid currentColor;
+        transition: opacity 90ms cubic-bezier(0, 0, .2, .1)
+    }
+
+    .mat-pseudo-checkbox.mat-pseudo-checkbox-checked, .mat-pseudo-checkbox.mat-pseudo-checkbox-indeterminate {
+        border-color: transparent
+    }
+
+    ._mat-animation-noopable.mat-pseudo-checkbox {
+        transition: none;
+        animation: none
+    }
+
+    ._mat-animation-noopable.mat-pseudo-checkbox::after {
+        transition: none
+    }
+
+    .mat-pseudo-checkbox-disabled {
+        cursor: default
+    }
+
+    .mat-pseudo-checkbox-disabled.mat-pseudo-checkbox-indeterminate {
+        opacity: .5
+    }
+
+    .mat-pseudo-checkbox-indeterminate::after {
+        top: 5px;
+        left: 1px;
+        width: 10px;
+        opacity: 1;
+        border-radius: 2px
+    }
+
+    .mat-pseudo-checkbox-checked::after {
+        top: 2.4px;
+        left: 1px;
+        width: 8px;
+        height: 3px;
+        border-left: 2px solid currentColor;
+        transform: rotate(-45deg);
+        opacity: 1
+    }</style>
+    <style>mat-dialog-content[_ngcontent-c26] {
+        min-height: 120px
+    }
+
+    mat-table[_ngcontent-c26] {
+        max-height: 65vh;
+        overflow: auto
+    }
+
+    table[_ngcontent-c26] td[_ngcontent-c26], table[_ngcontent-c26] tr[_ngcontent-c26] {
+        padding: 2px
+    }
+
+    .mat-cell[_ngcontent-c26], .mat-header-cell[_ngcontent-c26] {
+        text-align: center
+    }
+
+    .mat-cell.mat-column-event[_ngcontent-c26] {
+        text-align: right
+    }
+
+    .mat-header-row[_ngcontent-c26] {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        background: #fff
+    }</style>
+</head>
+<body class="mat-app-background" data-new-gr-c-s-check-loaded="14.1165.0" data-gr-ext-installed="" style="">
+<app-root _nghost-c0="" ng-version="7.0.2"><!---->
+    <app-navbar _ngcontent-c0="" _nghost-c1="" class="ng-star-inserted">
+        <mat-toolbar _ngcontent-c1="" class="mat-toolbar mat-primary mat-toolbar-single-row" color="primary"
+                     fxlayout="row" id="navbar" style="flex-direction: row; box-sizing: border-box; display: flex;">
+            <div _ngcontent-c1="" id="logo"></div><!----><a _ngcontent-c1="" aria-haspopup="true"
+                                                            class="nbtn mat-button" fxflex="110px" fxflex.sm="56px"
+                                                            fxflex.xs="56px" mat-button="" tabindex="0"
+                                                            aria-disabled="false"
+                                                            style="flex: 1 1 56px; box-sizing: border-box; max-width: 56px; min-width: 56px;"><span
+                class="mat-button-wrapper"><mat-icon _ngcontent-c1="" class="mat-icon material-icons" role="img"
+                                                     aria-hidden="true">format_list_bulleted</mat-icon><span
+                _ngcontent-c1="" fxhide.sm="" fxhide.xs="" fxshow="" style="display: none;">Отчеты</span></span>
+            <div class="mat-button-ripple mat-ripple" matripple=""></div>
+            <div class="mat-button-focus-overlay"></div>
+        </a><a _ngcontent-c1="" aria-haspopup="true" class="nbtn mat-button" fxflex="139px" fxflex.sm="56px"
+               fxflex.xs="56px" mat-button="" tabindex="0" aria-disabled="false"
+               style="flex: 1 1 56px; box-sizing: border-box; max-width: 56px; min-width: 56px;"><span
+                class="mat-button-wrapper"><mat-icon _ngcontent-c1="" class="mat-icon material-icons" role="img"
+                                                     aria-hidden="true">pageview</mat-icon><span _ngcontent-c1=""
+                                                                                                 fxhide.sm=""
+                                                                                                 fxhide.xs="" fxshow=""
+                                                                                                 style="display: none;">Мониторинг</span></span>
+            <div class="mat-button-ripple mat-ripple" matripple=""></div>
+            <div class="mat-button-focus-overlay"></div>
+        </a>
+            <mat-menu _ngcontent-c1="" class="ng-tns-c5-5 ng-star-inserted"><!----></mat-menu>
+            <mat-menu _ngcontent-c1="" class="ng-tns-c5-6 ng-star-inserted"><!----></mat-menu>
+            <div _ngcontent-c1="" class="space"></div><!----><!----><!---->
+            <mat-menu _ngcontent-c1="" class="ng-tns-c5-7 ng-star-inserted"><!----></mat-menu>
+            <button _ngcontent-c1="" aria-haspopup="true" mat-button="" class="mat-button ng-star-inserted"><span
+                    class="mat-button-wrapper"><mat-icon _ngcontent-c1="" class="mat-icon material-icons" role="img"
+                                                         aria-hidden="true">person_outline</mat-icon> Kh.Madambekov</span>
+                <div class="mat-button-ripple mat-ripple" matripple=""></div>
+                <div class="mat-button-focus-overlay"></div>
+            </button><!----></mat-toolbar>
+    </app-navbar>
+    <div _ngcontent-c0="" class="container">
+        <router-outlet _ngcontent-c0=""></router-outlet>
+        <app-call-log _nghost-c16="" class="ng-star-inserted">
+            <div _ngcontent-c16="" class="mat-elevation-z6">
+                <mat-toolbar _ngcontent-c16="" class="block-header mat-toolbar mat-toolbar-single-row"><span
+                        _ngcontent-c16="">Журнал звонков</span>
+                    <div _ngcontent-c16="" class="space"></div>
+                    <mat-form-field _ngcontent-c16=""
+                                    class="mat-form-field ng-tns-c11-8 mat-primary mat-form-field-type-mat-input mat-form-field-appearance-legacy mat-form-field-can-float mat-form-field-hide-placeholder ng-star-inserted">
+                        <div class="mat-form-field-wrapper">
+                            <div class="mat-form-field-flex"><!----><!---->
+                                <div class="mat-form-field-infix"><input _ngcontent-c16=""
+                                                                         class="mat-input-element mat-form-field-autofill-control cdk-text-field-autofill-monitored"
+                                                                         matinput="" placeholder="поиск по номеру"
+                                                                         id="mat-input-3" aria-invalid="false"
+                                                                         aria-required="false"><span
+                                        class="mat-form-field-label-wrapper"><!----><label
+                                        class="mat-form-field-label ng-tns-c11-8 mat-empty mat-form-field-empty ng-star-inserted"
+                                        id="mat-form-field-label-7" for="mat-input-3" aria-owns="mat-input-3"><!---->
+                                    <!---->поиск по номеру<!----><!----></label></span></div><!----></div><!---->
+                            <div class="mat-form-field-underline ng-tns-c11-8 ng-star-inserted"><span
+                                    class="mat-form-field-ripple"></span></div>
+                            <div class="mat-form-field-subscript-wrapper"><!----><!---->
+                                <div class="mat-form-field-hint-wrapper ng-tns-c11-8 ng-trigger ng-trigger-transitionMessages ng-star-inserted"
+                                     style="opacity: 1; transform: translateY(0%);"><!---->
+                                    <div class="mat-form-field-hint-spacer"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-form-field>
+                    <button _ngcontent-c16="" color="primary" mat-mini-fab="" mattooltip="Фильтр"
+                            class="mat-mini-fab mat-primary" aria-describedby="cdk-describedby-message-3"
+                            cdk-describedby-host=""><span class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                                               class="mat-icon material-icons"
+                                                                                               role="img"
+                                                                                               aria-hidden="true">search</mat-icon></span>
+                        <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                        <div class="mat-button-focus-overlay"></div>
+                    </button>&nbsp;
+
+                        <div class="mat-button-focus-overlay"></div>
+                    </button>
+                </mat-toolbar>
+                <div _ngcontent-c16="" class="table-container"><!---->
+                    <mat-table _ngcontent-c16="" class="mat-table" role="grid"><!---->
+                        <mat-header-row _ngcontent-c16="" class="mat-header-row ng-star-inserted" role="row"><!---->
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                             role="columnheader">дата
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-did mat-column-did ng-star-inserted"
+                                             role="columnheader">did
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                             role="columnheader">н.
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                             role="columnheader">и.
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-snum mat-column-snum ng-star-inserted"
+                                             role="columnheader">от
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-dnum mat-column-dnum ng-star-inserted"
+                                             role="columnheader">до
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-result mat-column-result ng-star-inserted"
+                                             role="columnheader">результат
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                             role="columnheader">дл.
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                             role="columnheader">дл. ожидания
+                            </mat-header-cell>
+                            <mat-header-cell _ngcontent-c16=""
+                                             class="mat-header-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                             role="columnheader">д.
+                            </mat-header-cell>
+                        </mat-header-row><!---->
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:44
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781507057
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Sardor Soatov</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">381</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->991920004<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-295"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> 0:12 </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----> 12с. <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-991920004-381-20240403-115544-1712127344.854999.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:39
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781508493
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: blue;" aria-hidden="true">call_received
+                                </mat-icon><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: grey;" aria-hidden="true">info
+                                </mat-icon>
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><!---->943060047
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!---->-<!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><!----><!----><span
+                                    _ngcontent-c16="" style="color: grey;" class="ng-star-inserted"><mat-icon
+                                    _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">info_outline</mat-icon> ivr</span>
+                                <!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-299"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> 0:05 </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->-
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host="" href="#" tabindex="-1" disabled="true"
+                                                         aria-disabled="true"><span class="mat-button-wrapper"><mat-icon
+                                    _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""
+                                        disabled=""><span class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                                               class="mat-icon material-icons"
+                                                                                               role="img"
+                                                                                               aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:33
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781507057
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Sardor Soatov</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">381</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->941960004<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-300"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> 0:08 </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----> 8с. <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-941960004-381-20240403-115533-1712127333.854996.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:32
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781508495
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Urazmetova Nazokat</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">228</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->933858902<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-301"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> 0:50 </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----> 50с. <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-933858902-228-20240403-115532-1712127332.854994.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:06
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: grey;" aria-hidden="true">dialer_sip
+                                </mat-icon>
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">SB 1 Post</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">185</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><p _ngcontent-c16="" class="ng-star-inserted">
+                                SB 9 Post</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">252</p><!----><!----><!----><!----><!---->
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                               style="color: green;"
+                                                                                               class="ng-star-inserted"><mat-icon
+                                    _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">check_circle</mat-icon> отвечен</span>
+                                <!----><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-302"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> 0:13 </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----> 6с. <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host="" href="#" tabindex="-1" disabled="true"
+                                                         aria-disabled="true"><span class="mat-button-wrapper"><mat-icon
+                                    _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""
+                                        disabled=""><span class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                                               class="mat-icon material-icons"
+                                                                                               role="img"
+                                                                                               aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:03
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781508496
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Abdunazarov Farhodjon</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">325</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->906736975<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-303"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> - </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->-
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-906736975-325-20240403-115503-1712127303.854986.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:02
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781508496
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Abdunazarov Farhodjon</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">325</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->906736975<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-303"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> - </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->-
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-906736975-325-20240403-115502-1712127302.854984.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:02
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781508496
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Abdunazarov Farhodjon</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">325</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->906736975<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-303"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> - </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->-
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-906736975-325-20240403-115502-1712127302.854982.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:01
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781508496
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Abdunazarov Farhodjon</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">325</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->906736975<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-303"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> - </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->-
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-906736975-325-20240403-115501-1712127301.854980.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row>
+                        <mat-row _ngcontent-c16="" class="mat-row ng-star-inserted" role="row"><!---->
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-calldate mat-column-calldate ng-star-inserted"
+                                      role="gridcell"> 03/04/2024 11:55:01
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-did mat-column-did ng-star-inserted"
+                                      role="gridcell"> 781508496
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-direction mat-column-direction ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->
+                                <mat-icon _ngcontent-c16="" class="mat-icon material-icons ng-star-inserted" role="img"
+                                          style="color: lightseagreen;" aria-hidden="true">call_made
+                                </mat-icon><!----></mat-cell>
+                            <mat-cell _ngcontent-c16="" class="mat-cell cdk-column-inf mat-column-inf ng-star-inserted"
+                                      role="gridcell"><!----><span _ngcontent-c16="" class="ng-star-inserted">-</span>
+                                <!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-snum mat-column-snum ng-star-inserted" role="gridcell">
+                                <!----><!----><p _ngcontent-c16="" class="ng-star-inserted">Abdunazarov Farhodjon</p>
+                                <p _ngcontent-c16="" class="ng-star-inserted">325</p><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-dnum mat-column-dnum ng-star-inserted" role="gridcell">
+                                <!----><!----><!----><!----><!----><!----><!---->906736975<!----><!----><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-result mat-column-result ng-star-inserted"
+                                      role="gridcell"><!----><!----><!----><!----><!----><!----><span _ngcontent-c16=""
+                                                                                                      style="color: red;"
+                                                                                                      class="ng-star-inserted"><!---->
+                                <!----><!----><span _ngcontent-c16="" style="color: orange;" class="ng-star-inserted"><mat-icon
+                                        _ngcontent-c16="" class="mat-icon material-icons" role="img" aria-hidden="true">call_missed_outgoing</mat-icon> нет ответа</span>
+                                <!----></span><!----><!----><!----><!----><!----><!----><!----><!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-talktime mat-column-talktime ng-star-inserted"
+                                      role="gridcell"><!----><!----><span _ngcontent-c16=""
+                                                                          aria-describedby="cdk-describedby-message-303"
+                                                                          cdk-describedby-host=""
+                                                                          class="ng-star-inserted"> - </span><!---->
+                                <!----></mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-holdtime mat-column-holdtime ng-star-inserted"
+                                      role="gridcell"><!----><!----><!---->-
+                            </mat-cell>
+                            <mat-cell _ngcontent-c16=""
+                                      class="mat-cell cdk-column-actions mat-column-actions ng-star-inserted"
+                                      role="gridcell"><a _ngcontent-c16="" color="primary" download=""
+                                                         mat-icon-button="" mattooltip="Скачать запись"
+                                                         class="mat-icon-button mat-primary"
+                                                         aria-describedby="cdk-describedby-message-296"
+                                                         cdk-describedby-host=""
+                                                         href="//10.99.9.23:3000/recfiles/2024/04/03/out-906736975-325-20240403-115501-1712127301.854978.wav"
+                                                         tabindex="0" aria-disabled="false"><span
+                                    class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                         class="mat-icon material-icons" role="img"
+                                                                         aria-hidden="true">file_download</mat-icon></span>
+                                <div class="mat-button-ripple mat-ripple mat-button-ripple-round" matripple=""></div>
+                                <div class="mat-button-focus-overlay"></div>
+                            </a>
+                                <button _ngcontent-c16="" color="accent" mat-icon-button=""
+                                        mattooltip="Прослушать запись" class="mat-icon-button mat-accent"
+                                        aria-describedby="cdk-describedby-message-297" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">volume_up</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                                <button _ngcontent-c16="" mat-icon-button="" mattooltip="Детали" class="mat-icon-button"
+                                        aria-describedby="cdk-describedby-message-298" cdk-describedby-host=""><span
+                                        class="mat-button-wrapper"><mat-icon _ngcontent-c16=""
+                                                                             class="mat-icon material-icons" role="img"
+                                                                             aria-hidden="true">info_outline</mat-icon></span>
+                                    <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                         matripple=""></div>
+                                    <div class="mat-button-focus-overlay"></div>
+                                </button>
+                            </mat-cell>
+                        </mat-row><!----></mat-table>
+                    <mat-paginator _ngcontent-c16="" class="mat-paginator">
+                        <div class="mat-paginator-outer-container">
+                            <div class="mat-paginator-container"><!---->
+                                <div class="mat-paginator-page-size ng-star-inserted">
+                                    <div class="mat-paginator-page-size-label">Отобразить</div><!---->
+
+                                <div class="mat-paginator-range-actions">
+                                    <div class="mat-paginator-range-label">1 - 10 из 1890</div><!---->
+                                    <button class="mat-paginator-navigation-previous mat-icon-button" mat-icon-button=""
+                                            type="button" aria-describedby="cdk-describedby-message-6"
+                                            cdk-describedby-host="" aria-label="Предыдущая страница" disabled=""><span
+                                            class="mat-button-wrapper"><svg class="mat-paginator-icon" focusable="false"
+                                                                            viewBox="0 0 24 24"><path
+                                            d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg></span>
+                                        <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                             matripple=""></div>
+                                        <div class="mat-button-focus-overlay"></div>
+                                    </button>
+                                    <button class="mat-paginator-navigation-next mat-icon-button" mat-icon-button=""
+                                            type="button" aria-describedby="cdk-describedby-message-7"
+                                            cdk-describedby-host="" aria-label="Следующая страница"><span
+                                            class="mat-button-wrapper"><svg class="mat-paginator-icon" focusable="false"
+                                                                            viewBox="0 0 24 24"><path
+                                            d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></span>
+                                        <div class="mat-button-ripple mat-ripple mat-button-ripple-round"
+                                             matripple=""></div>
+                                        <div class="mat-button-focus-overlay"></div>
+                                    </button><!----></div>
+                            </div>
+                        </div>
+                    </mat-paginator>
+                </div>
+            </div>
+        </app-call-log>
+    </div>
+</app-root>
+<script type="text/javascript" src="runtime.effbe7f6d9308294c02f.js"></script>
+<script type="text/javascript" src="polyfills.6d53a87ad70469e0c430.js"></script>
+<script type="text/javascript" src="main.06bab877026e1c19c170.js"></script>
+
+<div class="cdk-overlay-container"></div>
+<div id="cdk-describedby-message-container" aria-hidden="true" style="display: none;">
+    <div id="cdk-describedby-message-3">Фильтр</div>
+    <div id="cdk-describedby-message-4">Экспорт в Excel</div>
+    <div id="cdk-describedby-message-5">Настройки</div>
+    <div id="cdk-describedby-message-6">Предыдущая страница</div>
+    <div id="cdk-describedby-message-7">Следующая страница</div>
+    <div id="cdk-describedby-message-295">0:12</div>
+    <div id="cdk-describedby-message-296">Скачать запись</div>
+    <div id="cdk-describedby-message-297">Прослушать запись</div>
+    <div id="cdk-describedby-message-298">Детали</div>
+    <div id="cdk-describedby-message-299">0:05</div>
+    <div id="cdk-describedby-message-300">0:08</div>
+    <div id="cdk-describedby-message-301">0:50</div>
+    <div id="cdk-describedby-message-302">0:19</div>
+    <div id="cdk-describedby-message-303">-</div>
+</div>
+</body>

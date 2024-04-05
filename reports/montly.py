@@ -36,11 +36,13 @@ def monthly_generator(login, password):
     procedure_name = os.getenv("MONTHLY")  # THIS IS HOURLY DATA GATHERING
 
     # Set default values for date_begin and date_end if not provided
-    date_begin = datetime(2024, 2, 1).strftime('%Y%m%d')
-    date_end = datetime(2024, 3, 31).strftime('%Y%m%d')
-    CURRENT_MONTH = 2
-    CURRENT_YEAR = 2024
+    CURRENT_MONTH = datetime.now().month
+    CURRENT_YEAR = datetime.now().year
+
+    date_begin = datetime(CURRENT_YEAR, CURRENT_MONTH, 1).strftime('%Y%m%d')
+    date_end = datetime(CURRENT_YEAR, CURRENT_MONTH + 2, datetime.now().day+1).strftime('%Y%m%d')
     ##### CONNECTION STRING AND SQL QUERY ######################
+
     # Construct the connection string
     conn_str = f"mssql+pyodbc://{db_user}:{db_password}@{db_server}:{db_port}/{db_database}?driver={db_driver_name}"
     engine = create_engine(conn_str)

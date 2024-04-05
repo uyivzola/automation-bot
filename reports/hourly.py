@@ -34,10 +34,10 @@ def hourly_generator(login, password):
     procedure_name = os.getenv("HOURLY_SHORT")  # THIS IS HOURLY DATA GATHERING
 
     ##################### DATE - MARCH ######################
-    CURRENT_MONTH = 3
-    CURRENT_YEAR = 2024
-    today_date = datetime.now().strftime('%d/%m/%Y')
-    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%d/%m/%Y')
+    CURRENT_MONTH = datetime.now().month
+    CURRENT_YEAR = datetime.now().year
+    today_date = datetime.now().strftime('%Y%m%d')
+    tomorrow_date = (datetime.now() + timedelta(days=1)).strftime('%Y%m%d')
 
     ##################### CONNECTION STRING AND SQL QUERY ######################
     # Construct the connection string
@@ -58,12 +58,15 @@ def hourly_generator(login, password):
 
     ##################### BASIC FILTER ######################
     df['DataEntered'] = pd.to_datetime(df['DataEntered'])
-    df = df[(df['DataEntered'].dt.month == CURRENT_MONTH) & (df['DataEntered'].dt.year == CURRENT_YEAR) & (
-            df['DataEntered'].dt.date == datetime.now().date()) & df['Dname'].isin(
-        ['Оптовая реализация', 'Финансовая скидка'])]
+    df.columns = ['DocKind', 'InvoiceNumber', 'Goodid', 'GoodName', 'Manufacturer', 'INN', 'ClientName',
+                  'InvoiceManager',
+                  'ClientMan', 'PaymentTerm',
+                  'BasePrice', 'SellingPrice', 'Quantity', 'DataEntered', 'BaseAmount', 'TotalAmount']
 
-    df['B.Summ'] = df['BasePrice'] * df['Kolich']
-    df['TotalAmount'] = df['oPrice'] * df['Kolich']
+    df = df[(df['DataEntered'].dt.month == CURRENT_MONTH)
+            & (df['DataEntered'].dt.year == CURRENT_YEAR)
+            & (df['DataEntered'].dt.day == datetime.now().day)
+            & df['DocKind'].isin(['Оптовая реализация', 'Финансовая скидка'])]
 
     region_df['ClientMan'] = region_df['ClientMan'].str.title()
     df['ClientMan'] = df['ClientMan'].str.title()
@@ -72,26 +75,18 @@ def hourly_generator(login, password):
     df = pd.merge(df, paket_df[['Goodid', 'Paket']], left_on='Goodid', right_on='Goodid', how='left')
     df = pd.merge(df, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
 
-    df['OXVAT'] = df['inn'].map(df['inn'].value_counts())
-
-    df['inn_temp'] = pd.to_numeric(df['inn'], errors='coerce')
-    types_df['INN_temp'] = pd.to_numeric(types_df['INN'], errors='coerce')
-    df = pd.merge(df, types_df[['INN_temp', 'TYPE', 'RegionType']], left_on='inn_temp', right_on='INN_temp', how='left')
-
-    ##################### ROZ | SET | OPT  ######################
-    df['TYPE'].fillna('ROZ', inplace=True)
-    df.loc[df['TYPE'] == 'ROZ', 'RegionType'] = df['Region']
-    df.drop(['INN_temp', 'inn_temp'], axis=1, inplace=True)
-    df.columns = ['Office', 'IncData', 'Number', 'Dname', 'ExpData', 'SerialNo', 'Number', 'Month', 'Year', 'Data',
-                  'Goodid', 'Good', 'Producer', 'Client', 'Vid', 'type', 'inn', 'City', 'SalerMan', 'ClientMan',
-                  'Store', 'StoreDep', 'DownPayment', 'PaymentTerm', 'BasePrice', 'Price', 'oPrice', 'Kolich', 'MarkUp',
-                  'rMarkUp', 'p25', 'p100', 'OrderID', 'DataEntered', 'gkm_group', 'B.Summ', 'TotalAmount', 'Aksiya',
-                  'Paket', 'Region', 'OXVAT', 'TYPE', 'RegionType']
+    # df['OXVAT'] = df['INN'].map(df['INN'].value_counts())
+    #
+    # df['inn_temp'] = pd.to_numeric(df['INN'], errors='coerce')
+    # types_df['INN_temp'] = pd.to_numeric(types_df['INN'], errors='coerce')
+    # df = pd.merge(df, types_df[['INN_temp', 'TYPE', 'RegionType']], left_on='inn_temp', right_on='INN_temp', how='left')
+    #
+    # ##################### ROZ | SET | OPT  ######################
+    # df['TYPE'] = df['TYPE'].fillna('ROZ', inplace=True)
+    # df.loc[df['TYPE'] == 'ROZ', 'RegionType'] = df['Region']
+    # df.drop(['INN_temp', 'inn_temp'], axis=1, inplace=True)
 
     ##################### CONVERT TO CATEGORICAL DATA TYPE ######################
-    categorical_columns = ['TYPE', 'Region', 'Aksiya', 'Paket', 'ClientMan', 'Dname', 'Vid', 'City', 'type', 'Store',
-                           'StoreDep', 'RegionType', 'Month', 'Year', 'Office', 'Producer']
-    df[categorical_columns] = df[categorical_columns].astype('category')
     df.sort_values(by='DataEntered', ascending=False, inplace=True)
     df.to_excel(output_file_path, index=False)
 
