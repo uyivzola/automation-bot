@@ -17,7 +17,7 @@ def top_generator(login, password):
     today_date = datetime.now().strftime('%d %b')
     output_file_path = f'TOP ostatok - {today_date}.xlsx'
     xikmat_file_path = f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx'
-
+    ots_file_path = f'TOP ostatok - OTS Project - {today_date}.xlsx'
     # Access the environment variables
     db_server = os.getenv("DB_SERVER")
     db_database = os.getenv("DB_DATABASE_SERGELI")
@@ -63,6 +63,20 @@ def top_generator(login, password):
 
     # special for Xikmat
     manufacturers = ["Ever neuro pharma", "Ромфарм Компании - Румыния", "Ромфарм Комп/World Medicine"]
+    ots_products_df = ['Магвит №30', 'Риноксил Кидс 0,025% 10 мл спрей', 'Риноксил Формула+ 0,05 % 10 мл спрей',
+                       'Риноксил 0,1% 10мл спрей', 'Форсил со вкусом апельсина 3г №30', 'Авирол С №12',
+                       'Альцетро 5мг №20',
+                       'Доктор Синус 2,2г №30 пак.+уст-во для пром. п/носа', 'Риномакс Актив Таб №10',
+                       'Риномакс Бронхо пор. со вкусом апельсина 3г №10', 'Риномакс Хот  Лимон 22г №15 ',
+                       'Риномакс Хот Эффект Лимон 22г №15 ', 'Седоник №30 капс.',
+                       'Риномакс Инго 1,5мг/мл 30мл спрей орофарингеальный',
+                       'Омега-3-МИК 500мг №50 капс.',
+                       'Фарингоспрей 1,92мг/мл 30 мл спрей', 'Форсил Light 400 мг №10 капс.', 'Эрегра 100мг №4'
+
+                       ]
+    ots_df = result_df[result_df['Товар'].isin(ots_products_df)]
+    ots_df = ots_df.groupby(['Производитель', 'Товар', 'Selling Price']).agg(
+        {'остаток': 'sum', 'сумма': 'sum'}).reset_index()
     xikmat_df = result_df[result_df['Производитель'].isin(manufacturers)]
     xikmat_df = xikmat_df.groupby(['Производитель', 'Товар', 'Selling Price']).agg(
         {'остаток': 'sum', 'сумма': 'sum'}).reset_index()
@@ -71,5 +85,7 @@ def top_generator(login, password):
 
     df.to_excel(output_file_path, index=False)
     xikmat_df.to_excel(xikmat_file_path, index=False)
+    ots_df.to_excel(ots_file_path, index=False)
     formatter(df, output_file_path)
     formatter(xikmat_df, xikmat_file_path)
+    formatter(ots_df, ots_file_path)

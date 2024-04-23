@@ -4,11 +4,14 @@ import random
 from datetime import datetime, timedelta
 
 import requests
+from bs4 import BeautifulSoup
+from telegram.constants import ParseMode
 
 from reports.gulya_jokes import gulya_opa_jokes
 from reports.hourly import hourly_generator
 from reports.limit import limit_generator
 from reports.montly import monthly_generator
+from reports.okm import okm_generator
 from reports.oxvat import oxvat_generator
 from reports.to_finskidka import to_finskidka_generator
 from reports.top import top_generator
@@ -112,7 +115,8 @@ async def top(update, context):
     personal_name = context.user_data.get("personal_name", "")
 
     today_date = datetime.now().strftime('%d %b')
-    file_names = [f'TOP ostatok - {today_date}.xlsx', f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx']
+    file_names = [f'TOP ostatok - {today_date}.xlsx', f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx',
+                  f'TOP ostatok - OTS Project - {today_date}.xlsx']
     # Send a preliminary message
     message = await update.message.reply_text(
         f"Hurmatli {personal_name},Sizning so\'rovingiz bo\'yicha \n *TOP ostatok \- {today_date}\.xlsx* \nfayl tayyorlanmoqda😎 "
@@ -177,6 +181,40 @@ async def limit(update, context):
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
+async def currency(update, context):
+    message_id = update.message.message_id
+
+    # Send a GET request to the website
+    url = 'https://bank.uz/uz/currency'
+    response = requests.get(url)
+
+    # Parse the HTML content
+    soup = BeautifulSoup(response.content, 'html.parser')
+    # Extract "Sotish" (sell) data
+    sell_data = soup.find('div', class_='bc-inner-blocks-right').find_all('div', class_='bc-inner-block-left-texts')
+
+    # Extract "Sotib olish" (buy) data
+    buy_data = soup.find('div', class_='bc-inner-block-left').find_all('div', class_='bc-inner-block-left-texts')
+
+    # Prepare the message content
+    message = "<b>Sotish (Sell)</b>               <b>Sotib olish (Buy)</b>\n"
+    message += "<b>Bank Name</b>      <b>Rate</b>              <b>Bank Name</b>      <b>Rate</b>\n"
+
+    # Print the extracted data
+    print(f"{'Sotish':<30}{'Sotib olish'}")
+    print(f"{'Bank Name':<25}{'Rate':<15}{'Bank Name':<25}{'Rate'}")
+    for sell, buy in zip(sell_data, buy_data):
+        sell_bank_name = sell.find('span', class_='medium-text').text.strip()
+        sell_rate = sell.find('span', class_='medium-text green-date').text.strip()
+        buy_bank_name = buy.find('span', class_='medium-text').text.strip()
+        buy_rate = buy.find('span', class_='medium-text green-date').text.strip()
+        message += f"{sell_bank_name:<25}{sell_rate:<15}{buy_bank_name:<25}{buy_rate}\n"
+
+        print(f"{sell_bank_name:<25}{sell_rate:<15}{buy_bank_name:<25}{buy_rate}")
+
+    await update.message.reply_text(reply_to_message_id=message_id, text=message, parse_mode=ParseMode.HTML)
+
+
 async def hourly(update, context):
     user = update.message.from_user
     first_name = user.first_name
@@ -207,6 +245,44 @@ async def hourly(update, context):
                                             # caption=f"Analitikangizga aniqlik tilayman!📈, {first_name}💋💖!\n \n\n",
                                             # f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                             reply_to_message_id=message_id)
+        await message.delete()  # Send a final message
+
+    except Exception as e:
+        # Handle exceptions and reply with an error message
+        error_message = f'Error sending the file: {str(e)}'
+        print(error_message)
+        await update.message.reply_text(error_message, reply_to_message_id=message_id)
+
+
+async def okm(update, context):
+    user = update.message.from_user
+    first_name = user.first_name
+    message_id = update.message.message_id
+
+    login = context.user_data.get("login", "")
+    password = context.user_data.get("password", "")
+
+    today_date = datetime.now().strftime('%d %b')
+    file_name = f'ГАТ.xlsx'
+    chat_id = update.message.chat_id
+
+    # Send a preliminary message
+    message = await update.message.reply_text(f"*ГАТ \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 \n\n"
+                                              "||Iltimos kuting⌛⌛⌛\(Maksimum 3 daqiqa\)||", parse_mode='MarkdownV2',
+                                              reply_to_message_id=message_id)
+    okm_generator()
+    try:
+
+        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
+        current_time = datetime.now()
+        time_difference = current_time - modification_time
+        if not os.path.exists(file_name):
+            okm_generator()
+        # Open and send the document
+        with open(file_name, 'rb') as document:
+            await context.bot.send_document(chat_id, document,
+                                            reply_to_message_id=message_id,
+                                            caption='ГАТ -Гинокапс, Ацекард, Тризим')
         await message.delete()  # Send a final message
 
     except Exception as e:
@@ -407,8 +483,10 @@ async def delete_png_files(update, context) -> None:
 
 button_functions = {
     'LIMIT💸': limit,
+    '💵 kurs': currency,
     'OXVAT🙈': oxvat,
     'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
+    "ГАТ": okm,
     'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
     # 'FINSKIDKA📈': to_finskidka,
     'WEATHER❄️☀️ for today': weather,
