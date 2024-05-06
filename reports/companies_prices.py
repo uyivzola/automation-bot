@@ -50,66 +50,6 @@ order by i.DataEntered
 """
 
 
-async def all_companies_prices(update: Update, context=ContextTypes.DEFAULT_TYPE) -> bool:
-    # Extract data from the website and send prices to the user
-    chat_id = update.message.chat_id
-    await update.message.reply_text(text="Fetching data from the website...")
-    url = "https://fom.uz/en/org"
-    await extract_data_from_page(url, update, context)
-    await update.message.reply_text(text="Data fetching complete.")
-
-
-async def extract_data_from_page(url, update: Update, context=ContextTypes.DEFAULT_TYPE):
-    response = requests.get(url)
-    if response.status_code == 200:
-        html_content = response.text
-        soup = BeautifulSoup(html_content, "html.parser")
-        company_blocks = soup.find_all("div", class_="block company-list")
-        for company_block in company_blocks:
-            # Extract company details
-            company_name = company_block.find("div", class_="title").text.strip()
-            company_name = sanitize_filename(company_name)
-            phone_number_tag = company_block.find("div", class_="call").find("a")
-
-            if phone_number_tag:
-                phone_number = phone_number_tag["href"].split(":")[-1]
-            else:
-                phone_number = "Not available"
-
-            download_link_tag = company_block.find("div", class_="price").find("a")
-            if download_link_tag:
-                download_link = download_link_tag["href"]
-                file_extension = os.path.splitext(download_link)[1]
-                price_response = requests.get(download_link)
-                if price_response.status_code == 200:
-                    filename = f"{company_name}_price{file_extension}"
-                    with open(os.path.join(folder_path, filename), "wb") as f:
-                        f.write(price_response.content)
-                    logging.info(f"{filename} is given to bot as url")
-                    await context.bot.send_document(chat_id=update.message.chat_id,
-                                                    document=open(os.path.join(folder_path, filename), "rb"),
-                                                    caption=f'{company_name.title()}\n\n'
-                                                            f'☎️ {phone_number}')
-                    time.sleep(4)
-            else:
-                print(f"No download link found for {company_name}")
-
-        next_page_link = soup.find("li", class_="next").find("a")
-        if next_page_link:
-            next_page_url = url.split("/en/org")[0] + next_page_link["href"]
-            await extract_data_from_page(next_page_url, update, context)
-    else:
-        print(f"Failed to retrieve data from the page: {url}")
-
-
-def sanitize_filename(filename: str) -> str:
-    invalid_chars = r'%OOO"\''  # Add any other characters you want to exclude here
-    sanitized_filename = ''.join(char for char in filename if char not in invalid_chars)
-    # Replace other invalid characters with underscores
-    sanitized_filename = re.sub(r'[<>:"/\\|?*]', '', sanitized_filename)
-    return sanitized_filename.strip('_')
-
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
 
@@ -119,13 +59,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-async def sales_hunter(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text('🍗 Sales hunter is started...')
-
-    # while True:
-    # await check_for_updates(update, context)
-
-
 async def sale_hunter(update, context=ContextTypes.DEFAULT_TYPE) -> bool:
     await update.message.reply_text('🍗 Sales hunter is started...')
     # while True:
@@ -133,7 +66,7 @@ async def sale_hunter(update, context=ContextTypes.DEFAULT_TYPE) -> bool:
     #     time.sleep(GLOBAL_SLEEP_DURATION
 
 
-url = "https://fom.uz/en/org"
+URL = "https://fom.uz/en/org"
 # Create a folder to store downloaded files
 folder_path = "price_lists_companies"
 
@@ -141,7 +74,7 @@ if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
 
-def sanitize_filename(filename: str) -> str:
+async def sanitize_filename(filename: str) -> str:
     # Remove 'OOO' (three consecutive 'O' characters)
     filename = re.sub(r'OOO', '', filename)
     # Replace invalid characters with underscores
@@ -150,63 +83,75 @@ def sanitize_filename(filename: str) -> str:
     return sanitized_filename
 
 
-async def extract_data_from_page2(url, update: Update, context=ContextTypes.DEFAULT_TYPE):
-    # Send HTTP request
-    response = requests.get(url)
-    if response.status_code == 200:
-        html_content = response.text
-        # Parse HTML content
-        soup = BeautifulSoup(html_content, "html.parser")
-        # Find all company blocks
-        company_blocks = soup.find_all("div", class_="block company-list")
-        # Loop through each company block
-        for company_block in company_blocks:
-            # Extract company details
-            company_name = company_block.find("div", class_="title").text.strip()
-            company_name = sanitize_filename(company_name)
-            # Check if the download link exists
-            download_link_tag = company_block.find("div", class_="price").find("a")
-            phone_number_tag = company_block.find("div", class_="call").find("a")
-            phone_number = phone_number_tag["href"].split(":")[-1]
-            if download_link_tag:
-                download_link = download_link_tag["href"]
+async def extract_data_from_page(url, update: Update, context=ContextTypes.DEFAULT_TYPE):
+    try:
+        # Send HTTP request
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
 
-                # Get the file extension from the download link
-                file_extension = os.path.splitext(download_link)[1]
-                # Download price file
-                price_response = requests.get(download_link)
-                if price_response.status_code == 200:
-                    filename = f"{company_name}{file_extension}"
-                    with open(os.path.join(folder_path, filename), "wb") as f:
-                        f.write(price_response.content)
+        if response.status_code == 200:
+            html_content = response.text
+            # Parse HTML content
+            soup = BeautifulSoup(html_content, "html.parser")
+            # Find all company blocks
+            company_blocks = soup.find_all("div", class_="block company-list")
+            # Loop through each company block
+            for company_block in company_blocks:
 
-                    await context.bot.send_document(chat_id=update.message.chat_id,
-                                                    document=os.path.join(folder_path, filename),
-                                                    caption=f'{company_name.title()}\n\n'
-                                                            f'☎️ {phone_number}')
-                    time.sleep(4)
-            else:
-                print(f"No download link found for {company_name}")
-        # Find next page link if exists
-        next_page_link = soup.find("li", class_="next").find("a")
-        if next_page_link:
-            # Remove the duplicated "/en/org" part from the next page URL
-            next_page_url = url.split("/en/org")[0] + next_page_link["href"]
-            # Recursively extract data from the next page
-            await extract_data_from_page(url=next_page_url, update=update, context=context)
-    else:
-        print(f"Failed to retrieve data from the page: {url}")
+                # Extract company details
+                company_name: str = company_block.find("div", class_="title").text.strip()
+                company_name = await sanitize_filename(company_name)
+
+                phone_number_tag = company_block.find("div", class_="call").find("a")
+                if phone_number_tag:
+                    phone_number = phone_number_tag["href"].split(":")[-1]
+                else:
+                    phone_number = "Not available"
+
+                # Check if the download link exists
+                download_link_tag = company_block.find("div", class_="price").find("a")
+
+                if download_link_tag:
+                    download_link = download_link_tag["href"]
+                    file_extension = os.path.splitext(download_link)[1]
+                    # Download price file
+                    price_response = requests.get(download_link)
+                    if price_response.status_code == 200:
+                        filename = f"{company_name}{file_extension}"
+                        with open(os.path.join(folder_path, filename), "wb") as f:
+                            f.write(price_response.content)
+                        logging.info(f"{filename} is given to bot as url")
+                        await context.bot.send_document(chat_id=update.message.chat_id,
+                                                        document=open(os.path.join(folder_path, filename), "rb"),
+                                                        caption=f'{company_name}\n\n'
+                                                                f'☎️ {phone_number}')
+                        time.sleep(4)
+                else:
+                    print(f"No download link found for {company_name}")
+            # Find next page link if exists
+            next_page_link = soup.find("li", class_="next").find("a")
+            if next_page_link:
+                # Remove the duplicated "/en/org" part from the next page URL
+                next_page_url = url.split("/en/org")[0] + next_page_link["href"]
+                await extract_data_from_page(url=next_page_url, update=update, context=context)
+        else:
+            print(f"Failed to retrieve data from the page: {url}")
+    except (requests.RequestException, ValueError) as error:
+        logging.error(f"Error fetching data from {url}: {error}")
+        # Handle the error gracefully
 
 
 async def all_companies_prices(update: Update, context=ContextTypes.DEFAULT_TYPE) -> bool:
-    chat_id = update.message.chat_id
-    initial_message = await update.message.reply_text(text='Wait for a moment.⌚ '
-                                                           'Here are <b>Price List📄</b> of every <b><u>Distributor in Uzbekistan!</u></b>',
-                                                      parse_mode=ParseMode.HTML
-                                                      )
-
-    await extract_data_from_page(url=url, update=update, context=context)
-    await initial_message.delete()
+    initial_message = await update.message.reply_text(
+        text='Fetching data from the websites...⌛\nThis might take a while, please be patient.'
+    )
+    try:
+        await extract_data_from_page(url=URL, update=update, context=context)
+    except Exception as e:
+        logging.error(f"Error in fetching all companies prices: {e}")
+        await update.message.reply_text("An error occurred while fetching data. Please try again later.")
+    finally:
+        await initial_message.delete()
 
 
 def main():

@@ -1,4 +1,5 @@
 # buttons.py
+import logging
 import os
 import random
 from datetime import datetime, timedelta
@@ -13,10 +14,15 @@ from reports.limit import limit_generator
 from reports.montly import monthly_generator
 from reports.okm import okm_generator
 from reports.oxvat import oxvat_generator
+from reports.planned_actual_sales import planned_actual_sales_generator
 from reports.to_finskidka import to_finskidka_generator
 from reports.top import top_generator
 from reports.top_products_sold import top_product_sold_generator
 from reports.weather import weather
+
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 
 async def chuck_norris_jokes(update, context):
@@ -292,6 +298,43 @@ async def okm(update, context):
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
+async def planned_actual_sales(update, context) -> None:
+    user = update.message.from_user
+    first_name = user.first_name
+    message_id = update.message.message_id
+
+    yesterday = (datetime.now() - timedelta(days=1)).strftime('%d %B')
+    output_file_path = f'PLANNED - ACTUAL SALES - {yesterday}.xlsx'
+    chat_id = update.message.chat_id
+    # Send a preliminary message
+    message = await update.message.reply_text(f"<b>PLANNED ACTUAL SALES for {yesterday}.xlsx</b> is coming...",
+                                              parse_mode='HTML',
+                                              reply_to_message_id=message_id)
+    print(f'Creating {output_file_path}...')
+    planned_actual_sales_generator(output_file_path)
+    try:
+
+        modification_time = datetime.fromtimestamp(os.path.getmtime(output_file_path))
+        current_time = datetime.now()
+        time_difference = current_time - modification_time
+        if not os.path.exists(output_file_path):
+            print(f'Again creating {output_file_path}...\nBecause it does not exists.')
+            planned_actual_sales_generator(output_file_path)
+
+        # Open and send the document
+        with open(output_file_path, 'rb') as document:
+            await context.bot.send_document(chat_id, document,
+                                            reply_to_message_id=message_id,
+                                            caption=f'PLANNED ACTUAL SALES for {yesterday}')
+        await message.delete()  # Send a final message
+
+    except Exception as e:
+        # Handle exceptions and reply with an error message
+        error_message = f'Error sending the file: {str(e)}'
+        print(error_message)
+        await update.message.reply_text(error_message, reply_to_message_id=message_id)
+
+
 async def to_finskidka(update, context):
     user = update.message.from_user
     username = user.first_name
@@ -427,22 +470,26 @@ async def delete_xlsx_files(update, context) -> None:
     # Get the chat ID and user ID for logging purposes
     chat_id = update.message.chat_id
     user_id = update.message.from_user.id
+    first_name = update.message.from_user.first_name
 
     # Specify the directory where you want to delete '*.xlsx' files
-    directory_path = './'
+    directory_paths = ['./', 'price_lists_companies']
 
     try:
         # Iterate through files in the directory and try to delete '*.png' files with names longer than 11 characters
-        for filename in os.listdir(directory_path):
-            if filename.endswith(".xlsx"):
-                file_path = os.path.join(directory_path, filename)
-                try:
-                    os.remove(file_path)
-                    await update.message.reply_text(f'{filename} has been deleted successfully!')
-                except Exception as e:
-                    # Log any errors that may occur during the file deletion process
-                    error_message = f"Error deleting {filename}: {str(e)}"
-                    await context.bot.send_message(chat_id=chat_id, text=error_message)
+        for directory_path in directory_paths:
+            for filename in os.listdir(directory_path):
+                for file_extensions in ['.xlsx', '.csv', '.xls']:
+                    if filename.endswith(file_extensions):
+                        file_path = os.path.join(directory_path, filename)
+                        try:
+                            os.remove(file_path)
+                            logger.info('%s deleted %s', first_name, file_path)
+                            # await update.message.reply_text(f'{filename} has been deleted successfully!')
+                        except Exception as e:
+                            # Log any errors that may occur during the file deletion process
+                            error_message = f"Error deleting {filename}: {str(e)}"
+                            await context.bot.send_message(chat_id=chat_id, text=error_message)
 
         # Notify the user about the completion of the deletion process
         await update.message.reply_text('Excel files have been deleted successfully!')
@@ -487,6 +534,7 @@ button_functions = {
     'OXVAT🙈': oxvat,
     'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
     "ГАТ": okm,
+    "PLANNED | ACTUAL SALES": planned_actual_sales,
     'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
     # 'FINSKIDKA📈': to_finskidka,
     'WEATHER❄️☀️ for today': weather,

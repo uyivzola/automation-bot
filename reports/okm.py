@@ -46,13 +46,14 @@ DECLARE @DateEnd DATETIME;
 SET @DateBegin = DATEADD(month, DATEDIFF(month, 0, GETDATE()), 0);
 
 -- Set the end date as the current date
-SET @DateEnd = GETDATE()+1;
+SET @DateEnd = EOMONTH(GETDATE())
 
 -- Call the stored procedure with the calculated dates
 EXEC gTOandFSkidka @DateBegin, @DateEnd;
 """
-def okm_generator():
 
+
+def okm_generator():
     #####################  EXECUTION  ######################
     df = pd.read_sql_query(sql_query, engine)
     df.columns = ['DocName', 'InvoiceNumber', 'Year', 'Month', 'Data', 'GoodId', 'Good', 'Producer',
@@ -70,16 +71,15 @@ def okm_generator():
     df_selected = selected_invoices[selected_invoices['GoodId'].isin(good_ids)]
     df_final = pd.concat([df_tovar, df_selected])
 
-    df_final = pd.merge(df_final, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan', how='left')
+    df_final = pd.merge(df_final, region_df[['ClientMan', 'Region']], left_on='ClientMan', right_on='ClientMan',
+                        how='left')
     df_final = pd.merge(df_final, okm_df[['GoodId', 'Aksiya']], left_on='GoodId', right_on='GoodId', how='left')
-
 
     def save_workbook(workbook, output_file_path):
         try:
             workbook.save(output_file_path)
         except Exception as e:
             print(f"Error saving workbook: {e}")
-
 
     def create_work_sheet(workbook, type_value, pivot_table, i):
         # Create a new sheet with the type name
@@ -159,11 +159,9 @@ def okm_generator():
                 cell.border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
                                      bottom=Side(style='thin'))
 
-
     workbook = Workbook()
     default_sheet = workbook.active
     workbook.remove(default_sheet)
-    excel_writer = pd.ExcelWriter('Aksiya.xlsx', engine='openpyxl')
 
     for i, aksiya in enumerate(sorted(df_final['Aksiya'].unique()), start=1):
         # Filter the DataFrame for the current 'Aksiya' value
@@ -187,4 +185,3 @@ def okm_generator():
         pivoted_df = pd.concat([pivoted_df, total_row], ignore_index=False)
         create_work_sheet(workbook=workbook, type_value=aksiya, pivot_table=pivoted_df, i=i)
     save_workbook(workbook=workbook, output_file_path=output_file_path)
-
