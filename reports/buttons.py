@@ -1,5 +1,5 @@
 # buttons.py
-import logging
+import logging.config
 import os
 import random
 from datetime import datetime, timedelta
@@ -8,10 +8,11 @@ import requests
 from bs4 import BeautifulSoup
 from telegram.constants import ParseMode
 
+from reports.date_selector import date_selection_required
 from reports.gulya_jokes import gulya_opa_jokes
 from reports.hourly import hourly_generator
 from reports.limit import limit_generator
-from reports.montly import monthly_generator
+from reports.monthly import monthly_generator
 from reports.okm import okm_generator
 from reports.oxvat import oxvat_generator
 from reports.planned_actual_sales import planned_actual_sales_generator
@@ -20,6 +21,7 @@ from reports.top import top_generator
 from reports.top_products_sold import top_product_sold_generator
 from reports.weather import weather
 
+logging.config.fileConfig('config/logging_config.ini')
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 logger = logging.getLogger(__name__)
@@ -89,8 +91,8 @@ async def oxvat(update, context):
     password = context.user_data.get("password", "")
 
     # Send a preliminary message
-    message = await update.message.reply_text(f'*NE OXVACHEN \- {today_date}\.xlsx*\n\nfayl tayyorlanmoqda😎\n\n'
-                                              '||Iltimos kuting⌛⌛⌛\(Maksimum 3 daqiqa\)||', parse_mode='MarkdownV2',
+    message = await update.message.reply_text(f'<b>NE OXVACHEN - {today_date}.xlsx</b>\n\nfayl tayyorlanmoqda😎\n\n'
+                                              'Iltimos kuting⌛⌛⌛(Maksimum 3 daqiqa)', parse_mode='HTML',
                                               reply_to_message_id=message_id)
     try:
         oxvat_generator(login, password)
@@ -108,52 +110,61 @@ async def oxvat(update, context):
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
+        logging.error(error_message)
 
 
 async def top(update, context):
-    chat_id = update.message.chat_id
-    message_id = update.message.message_id
+    if update.callback_query:
+        chat_id = update.callback_query.message.chat_id
+        message_id = update.callback_query.message.message_id
+    else:
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
 
-    login = context.user_data.get("login", "")
-    password = context.user_data.get("password", "")
     personal_name = context.user_data.get("personal_name", "")
 
     today_date = datetime.now().strftime('%d %b')
-    file_names = [f'TOP ostatok - {today_date}.xlsx', f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx',
-                  f'TOP ostatok - OTS Project - {today_date}.xlsx']
+
+    current_directory = os.getcwd()
+    files_in_directory = os.listdir(current_directory)
+
     # Send a preliminary message
     message = await update.message.reply_text(
-        f"Hurmatli {personal_name},Sizning so\'rovingiz bo\'yicha \n *TOP ostatok \- {today_date}\.xlsx* \nfayl tayyorlanmoqda😎 "
-        "Iltimos kuting⌛\(Maksimum 3 daqiqa\)", parse_mode='MarkdownV2', reply_to_message_id=message_id)
+        f"Hurmatli <b>{personal_name}</b>, Sizning so\'rovingiz bo\'yicha\n"
+        f"<b>TOP OSTATOK.xlsx</b> \n fayl tayyorlanmoqda😎\n\n"
+        "Iltimos kuting⌛⌛⌛ (o\'rtacha 5 daqiqa)", parse_mode='HTML', reply_to_message_id=message_id)
+
+    logging.info(f'Started processing {top.__name__} request for user: {personal_name}')
+
     try:
         # Open and send the document
-        for file in file_names:
-            if not os.path.exists(file):
-                top_generator(login, password)
-            # Check the modification time of the file
-            modification_time = datetime.fromtimestamp(os.path.getmtime(file))
+        logging.info(f'Calling {top_generator.__name__} function.')
 
-            # Current time
-            current_time = datetime.now()
+        top_generator()
+        file_names = [file for file in files_in_directory if file.startswith("TOP ostatok")]
 
+        logging.info(f'Completed {top_generator.__name__} function.')
+
+        for file_name in file_names:
             # Check if the file was modified more than 2 hours ago
-            time_difference = current_time - modification_time
-            if time_difference >= timedelta(minutes=1):
-                top_generator(login, password)
 
-            with open(file, 'rb') as document:
-                print(f'Sending {file}')
+            with open(file_name, 'rb') as document:
+                logging.info(f'Sending file {document} to chat {chat_id}.')
                 await context.bot.send_document(chat_id, document, reply_to_message_id=message_id)
 
-        await message.delete()
+            logging.info(f'Deleting {file_name}')
+            os.remove(file_name)
 
+        logging.info('Deleting preliminary message.')
+        await message.delete()
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
+        logging.error(error_message)
+
+    logging.info(f'Finished processing {top.__name__} request for user: {personal_name}')
 
 
 async def limit(update, context):
@@ -166,16 +177,20 @@ async def limit(update, context):
     login = context.user_data.get("login", "")
     password = context.user_data.get("password", "")
     personal_name = context.user_data.get("personal_name", "")
+
     # Send a preliminary message
     message = await update.message.reply_text(
-        f"Hurmatli *{personal_name}*, Sizning so\'rovingiz bo\'yicha  \n *LIMIT \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 "
-        "Iltimos kuting⌛⌛⌛ \(o\'rtacha 5 daqiqa\)", parse_mode='MarkdownV2', reply_to_message_id=message_id)
+        f"Hurmatli <b>{personal_name}</b>, Sizning so\'rovingiz bo\'yicha\n<b>{file_name}</b> \n fayl tayyorlanmoqda😎\n\n"
+        "Iltimos kuting⌛⌛⌛ (o\'rtacha 5 daqiqa)", parse_mode='HTML', reply_to_message_id=message_id)
 
+    logging.info(f'Started processing {limit.__name__} request for user: {personal_name}')
     try:
+        logging.info('Calling limit_generator function.')
         limit_generator(login, password, context)
+        logging.info(f'Opening file {file_name}.')
 
-        # Open and send the document
         with open(file_name, 'rb') as document:
+            logging.info(f'Sending file {document} to chat {chat_id}.')
             await context.bot.send_document(chat_id, document, reply_to_message_id=message_id)
 
         # Delete the preliminary message
@@ -183,8 +198,10 @@ async def limit(update, context):
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
+        logging.error(error_message)
+
+    logging.info(f'Finished processing {limit.__name__} request for user: {personal_name} (Login: {login}).')
 
 
 async def currency(update, context):
@@ -234,29 +251,26 @@ async def hourly(update, context):
     chat_id = update.message.chat_id
 
     # Send a preliminary message
-    message = await update.message.reply_text(f"*HOURLY \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 \n\n"
-                                              "||Iltimos kuting⌛⌛⌛\(Maksimum 3 daqiqa\)||", parse_mode='MarkdownV2',
+    message = await update.message.reply_text(f"<b>{file_name}</b> \n fayl tayyorlanmoqda😎 \n\n"
+                                              "Iltimos kuting⌛⌛⌛ (Maksimum 3 daqiqa)", parse_mode='HTML',
                                               reply_to_message_id=message_id)
-    hourly_generator(login, password)
     try:
-
-        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
-        current_time = datetime.now()
-        time_difference = current_time - modification_time
-        if not os.path.exists(file_name):
-            hourly_generator(login, password)
-        # Open and send the document
+        hourly_generator(login, password)
+        logging.info(f'Opening file {file_name}.')
         with open(file_name, 'rb') as document:
             await context.bot.send_document(chat_id, document,
                                             # caption=f"Analitikangizga aniqlik tilayman!📈, {first_name}💋💖!\n \n\n",
                                             # f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
                                             reply_to_message_id=message_id)
-        await message.delete()  # Send a final message
+
+        await message.delete()
+        os.remove(file_name)
+        logging.info(f'File {file_name} deleted.')
 
     except Exception as e:
         # Handle exceptions and reply with an error message
-        error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
+        error_message = f'Error sending or deleting the file: {str(e)}'
+        logging.error(error_message)
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
@@ -268,34 +282,34 @@ async def okm(update, context):
     login = context.user_data.get("login", "")
     password = context.user_data.get("password", "")
 
-    today_date = datetime.now().strftime('%d %b')
+    today_date = datetime.now().strftime('%d %b : %H:%M')
     file_name = f'ГАТ.xlsx'
     chat_id = update.message.chat_id
 
     # Send a preliminary message
-    message = await update.message.reply_text(f"*ГАТ \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 \n\n"
-                                              "||Iltimos kuting⌛⌛⌛\(Maksimum 3 daqiqa\)||", parse_mode='MarkdownV2',
+    message = await update.message.reply_text(f"{file_name} at {today_date}\n fayl tayyorlanmoqda😎 \n\n"
+                                              "Iltimos kuting⌛⌛⌛(Maksimum 3 daqiqa)", parse_mode='HTML',
                                               reply_to_message_id=message_id)
-    okm_generator()
     try:
+        logging.info(f'Start running {okm_generator.__name__}')
+        okm_generator()
 
-        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
-        current_time = datetime.now()
-        time_difference = current_time - modification_time
-        if not os.path.exists(file_name):
-            okm_generator()
-        # Open and send the document
+        logging.info(f'Opening file {file_name}.')
         with open(file_name, 'rb') as document:
             await context.bot.send_document(chat_id, document,
                                             reply_to_message_id=message_id,
-                                            caption='ГАТ -Гинокапс, Ацекард, Тризим')
-        await message.delete()  # Send a final message
+                                            caption=f'ГАТ - Гинокапс, Ацекард, Тризим\n\n'
+                                                    f'Updated: {today_date}')
+
+        await message.delete()
+        os.remove(file_name)
+        logging.info(f'File {file_name} deleted.')
 
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
+        logging.error(error_message)
 
 
 async def planned_actual_sales(update, context) -> None:
@@ -310,110 +324,98 @@ async def planned_actual_sales(update, context) -> None:
     message = await update.message.reply_text(f"<b>PLANNED ACTUAL SALES for {yesterday}.xlsx</b> is coming...",
                                               parse_mode='HTML',
                                               reply_to_message_id=message_id)
-    print(f'Creating {output_file_path}...')
-    planned_actual_sales_generator(output_file_path)
     try:
+        logging.info(f'Creating {output_file_path}...')
+        planned_actual_sales_generator(output_file_path)
 
-        modification_time = datetime.fromtimestamp(os.path.getmtime(output_file_path))
-        current_time = datetime.now()
-        time_difference = current_time - modification_time
-        if not os.path.exists(output_file_path):
-            print(f'Again creating {output_file_path}...\nBecause it does not exists.')
-            planned_actual_sales_generator(output_file_path)
-
-        # Open and send the document
+        logging.info(f'Opening file {output_file_path}.')
         with open(output_file_path, 'rb') as document:
             await context.bot.send_document(chat_id, document,
                                             reply_to_message_id=message_id,
                                             caption=f'PLANNED ACTUAL SALES for {yesterday}')
-        await message.delete()  # Send a final message
-
+        await message.delete()
+        os.remove(output_file_path)
+        logging.info(f'File {output_file_path} deleted.')
     except Exception as e:
-        # Handle exceptions and reply with an error message
+
         error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
+        logging.error(error_message)
 
 
+@date_selection_required
 async def to_finskidka(update, context):
-    user = update.message.from_user
-    username = user.first_name
-    message_id = update.message.message_id
+    logging.info('Start To Finskidka')
 
-    login = context.user_data.get("login", "")
-    password = context.user_data.get("password", "")
-    today_date = datetime.now().strftime('%d %b')
-    file_name = f'TOandFinSkidka.xlsx'
-    chat_id = update.message.chat_id
+    selected_dates = context.user_data.get('selected_dates')
+    if not selected_dates:
+        await update.message.reply_text('Please select the dates first.')
+        return
+
+    start_date = selected_dates["start_date"]
+    end_date = selected_dates["end_date"]
+    logging.info(f'Selected dates: {start_date} - {end_date}')
+    if update.callback_query:
+        chat_id = update.callback_query.message.chat_id
+        message_id = update.callback_query.message.message_id
+    else:
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
 
     # Send a preliminary message
-    message = await update.message.reply_text(f"*TOandFinSkidka \- {today_date}\.xlsx* \n fayl tayyorlanmoqda😎 \n\n"
-                                              "||Iltimos kuting⌛⌛⌛\(Maksimum 3 daqiqa\)||", parse_mode='MarkdownV2',
-                                              reply_to_message_id=message_id)
-
+    message = await context.bot.send_message(
+        chat_id,
+        f"Data for {start_date} to {end_date} is being prepared.\n\nBe Patient!",
+        reply_to_message_id=message_id
+    )
     try:
-        if not os.path.exists(file_name):
-            to_finskidka_generator(login, password)
+        logging.info('Start generating To Finskidka')
+        file_name = to_finskidka_generator(start_date=start_date, end_date=end_date)
+        logging.info('ENDED generating To Finskidka')
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
-        current_time = datetime.now()
-        time_difference = current_time - modification_time
 
-        if time_difference >= timedelta(hours=2):
-            print(f'i am running {to_finskidka_generator.__name__}')
-            to_finskidka_generator(login, password)
-
-        # Open and send the document
         with open(file_name, 'rb') as document:
-
             await context.bot.send_document(chat_id, document,
-                                            caption=f"Analitikangizga aniqlik tilayman!📈, {username}!\n \n\n"
-                                                    f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
+                                            caption=f"Period: From {start_date} -> {end_date} 📈\n\n\n"
+                                                    f"🔁Updated: {modification_time.strftime('%Y. %d %B,%H:%M')}",
                                             reply_to_message_id=message_id)
+            await message.delete()
 
-        await message.delete()  # Delete preliminary message
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
-        await update.message.reply_text(error_message, reply_to_message_id=message_id)
+        await update.callback_query.message.reply_text(error_message, reply_to_message_id=message_id)
+        logging.error(error_message)
 
 
 async def monthly(update, context):
-    today_date = datetime.now().strftime('%d %b')
-    file_name = f'MONTHLY.xlsx'
     chat_id = update.message.chat_id
     message_id = update.message.message_id
 
-    login = context.user_data.get("login", "")
-    password = context.user_data.get("password", "")
+    CURRENT_MONTH = datetime.now().month
+    CURRENT_YEAR = datetime.now().year
+
+    start_date = datetime(CURRENT_YEAR, CURRENT_MONTH, 1).strftime('%Y%m%d')
+    end_date = datetime(CURRENT_YEAR, CURRENT_MONTH, datetime.now().day + 1).strftime('%Y%m%d')
 
     # Send a preliminary message
-    message = await update.message.reply_text(f"*SALES\.xlsx*\n\nfayl tayyorlanmoqda😎 \n\n"
-                                              "||Iltimos kuting⌛⌛⌛\(Maksimum 8 daqiqa\)||", parse_mode='MarkdownV2',
+    message = await update.message.reply_text(f"Be Patient. I am working on it",
                                               reply_to_message_id=message_id)
 
     try:
-        if not os.path.exists(file_name):
-            monthly_generator(login, password)
+        file_name = monthly_generator(current_month=True, start_date=start_date, end_date=end_date)
 
         modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
         current_time = datetime.now()
-        time_difference = current_time - modification_time
-
-        if time_difference >= timedelta(hours=2):
-            monthly_generator(login, password)
 
         # Open and send the document
         with open(file_name, 'rb') as document:
-            await context.bot.send_document(chat_id, document, caption=f"FEBRUARY SALES -> {today_date} 📈\n\n\n"
-                                                                       f"🔁Updated: {modification_time.strftime('%d %B,%H:%M')}",
+            await context.bot.send_document(chat_id, document,
+                                            caption=f"Period: From {start_date} -> {end_date} 📈\n\n\n"
+                                                    f"🔁Updated: {modification_time.strftime('%Y. %d %B,%H:%M')}",
                                             reply_to_message_id=message_id)
         await message.delete()
-
-        spoiler_text = ("|| Nixxuya charchatvordiz oka\!"
-                        " Rosa qiynaldim formatlagani\, blin\! ||")
-        await update.message.reply_text(spoiler_text, parse_mode='MarkdownV2')
 
     except Exception as e:
         # Handle exceptions and reply with an error message
@@ -422,47 +424,118 @@ async def monthly(update, context):
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
+@date_selection_required
+async def past_monthly(update, context):
+    selected_dates = context.user_data.get('selected_dates')
+
+    if not selected_dates:
+        await update.message.reply_text("Please select the dates first.")
+        return
+
+    start_date = selected_dates['start_date']
+    end_date = selected_dates['end_date']
+    if update.callback_query:
+        chat_id = update.callback_query.message.chat_id
+        message_id = update.callback_query.message.message_id
+    else:
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+
+    # Send a preliminary message
+    message = await context.bot.send_message(
+        chat_id,
+        f"Data for {start_date} to {end_date} is being prepared.\n\nBe Patient!",
+        reply_to_message_id=message_id
+    )
+    try:
+        file_name = monthly_generator(current_month=False, start_date=start_date, end_date=end_date)
+
+        modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
+        current_time = datetime.now()
+
+        # Open and send the document
+        with open(file_name, 'rb') as document:
+            await context.bot.send_document(chat_id, document,
+                                            caption=f"Period: From {start_date} -> {end_date} 📈\n\n\n"
+                                                    f"🔁Updated: {modification_time.strftime('%Y. %d %B,%H:%M')}",
+                                            reply_to_message_id=message_id)
+        await message.delete()
+
+    except Exception as e:
+        # Handle exceptions and reply with an error message
+        error_message = f'Error sending the file: {str(e)}'
+        logging.error(error_message)
+        await update.callback_query.message.reply_text(error_message, reply_to_message_id=message_id)
+
+
+@date_selection_required
 async def top_high_fav(update, context):
-    message_id = update.message.message_id
-    chat_id = update.message.chat_id
+    selected_dates = context.user_data.get('selected_dates')
 
-    current_date = datetime.now()
-    formatted_date = f'{current_date.day} {current_date.strftime("%B")}'
+    if not selected_dates:
+        await update.message.reply_text("Please select the dates first.")
+        return
 
-    login = context.user_data.get("login", "")
-    password = context.user_data.get("password", "")
+    start_date = selected_dates['start_date']
+    end_date = selected_dates['end_date']
 
-    top_files = {
-        'TOP_REVENUE_PRODUCTS_SOLD.xlsx': 'Товары, приносящие наибольший доход, среди клиентов в различных регионах и типах на',
-        'HIGH_VOLUME_PRODUCTS.xlsx': 'Товары с наибольшим объемом(колич) продаж среди клиентов в различных регионах и типах на',
-        'CLIENT_FAVORITE_PRODUCTS.xlsx': 'Товары, популярные среди клиентов в различных регионах и разных типов на'}
-    message = await update.message.reply_text(
-        f'Sizning so\'rovingiz bo\'yicha  \n *TOP REVENUE PRODUCTS SOLD\.xlsx* \n fayl tayyorlanmoqda😎 '
-        'Iltimos kuting⌛⌛⌛ \(o\'rtacha 2 daqiqa\)', parse_mode='MarkdownV2', reply_to_message_id=message_id)
+    selected_dates = context.user_data.get('selected_dates')
+
+    if not selected_dates:
+        await update.message.reply_text("Please select the dates first.")
+        return
+
+    start_date = selected_dates['start_date']
+    end_date = selected_dates['end_date']
+    if update.callback_query:
+        chat_id = update.callback_query.message.chat_id
+        message_id = update.callback_query.message.message_id
+    else:
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+
+    # Send a preliminary message
+    message = await context.bot.send_message(
+        chat_id,
+        f"Data for {start_date} to {end_date} is being prepared.\n\nBe Patient!",
+        reply_to_message_id=message_id
+    )
 
     try:
-        for file, file_desc in top_files.items():
-            top_product_sold_generator(login, password)
+        logging.info(f'Top High Fav: {start_date} to {end_date}')
+        top_files = top_product_sold_generator(start_date=start_date, end_date=end_date)
+        logging.info(f'OUTSIDE: {start_date} to {end_date}')
+
+        for function_name, file_data in top_files.items():
+            file_name = file_data['file_name']
+            file_desc = file_data['description']
+            picture_name = file_data['picture_name']
             # Open and send the document
-            with open(file, 'rb') as document:
-                caption_text = (f"\n\n{file_desc}\n<b><u>{formatted_date}</u></b>\n\n\n")
+            modification_time = datetime.fromtimestamp(os.path.getmtime(file_name))
+            with open(file_name, 'rb') as document:
+
+                caption_text = (f"{file_desc}\n\n"
+                                f"Period: From <b><u>{start_date} -> {end_date} 📈</u></b>\n\n\n"
+                                f"🔁Updated: {modification_time.strftime('%Y. %d %B,%H:%M')}")
 
                 main_file_message = await context.bot.send_document(chat_id, document, caption=caption_text,
                                                                     parse_mode='HTML', reply_to_message_id=message_id)
-
-                for subtype in ['ROZ', 'Сеть']:
-                    picture_file_path = f'reports/trash_media/Top_20_Goods_{file.split("_")[1]}_{subtype}.png'
-                    with open(picture_file_path, 'rb') as picture:
-                        if os.path.exists(picture_file_path):
-                            await context.bot.send_photo(chat_id, photo=picture,
-                                                         caption=f'ТОП 20 {file_desc} - {subtype}',
-                                                         reply_to_message_id=main_file_message.message_id)
-
+                # try:
+                #     for subtype in ['ROZ', 'Сеть']:
+                #         picture_file_path = f'reports/trash_media/Top_20_Goods_{file_name.split("-")[1].split("_")[0]}_{subtype}.png'
+                #         with open(picture_file_path, 'rb') as picture:
+                #             if os.path.exists(picture_file_path):
+                #                 await context.bot.send_photo(chat_id, photo=picture,
+                #                                              caption=f'ТОП 20 {file_desc} - {subtype}',
+                #                                              reply_to_message_id=main_file_message.message_id)
+                #         # os.remove(picture_file_path)
+                # except Exception as e:
+                #     logging.error(e)
         await message.delete()
     except Exception as e:
         # Handle exceptions and reply with an error message
         error_message = f'Error sending the file: {str(e)}'
-        print(error_message)
+        logging.error(error_message)
         await update.message.reply_text(error_message, reply_to_message_id=message_id)
 
 
@@ -484,7 +557,7 @@ async def delete_xlsx_files(update, context) -> None:
                         file_path = os.path.join(directory_path, filename)
                         try:
                             os.remove(file_path)
-                            logger.info('%s deleted %s', first_name, file_path)
+                            logger.info(f'{first_name} deleted {file_path}')
                             # await update.message.reply_text(f'{filename} has been deleted successfully!')
                         except Exception as e:
                             # Log any errors that may occur during the file deletion process
@@ -529,14 +602,20 @@ async def delete_png_files(update, context) -> None:
 
 
 button_functions = {
+    'FINSKIDKA📈': to_finskidka,
+    '️Past Monthly': past_monthly,
     'LIMIT💸': limit,
     '💵 kurs': currency,
     'OXVAT🙈': oxvat,
-    'TOP OSTATOK🔄️': top, '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
+    'TOP OSTATOK🔄️': top,
+    '🔝 TOP | FAV | HIGH SOLD': top_high_fav,
     "ГАТ": okm,
     "PLANNED | ACTUAL SALES": planned_actual_sales,
-    'HOURLY⏳': hourly, '️Monthly  ⛏️️️': monthly,
-    # 'FINSKIDKA📈': to_finskidka,
+    'HOURLY⏳': hourly,
+    '️Current Month️️': monthly,
     'WEATHER❄️☀️ for today': weather,
-    'Jokes about Gulya😅': gulya_jokes, '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
-    '🗑️ Clear Files': delete_xlsx_files, '🖼️ Delete PNG': delete_png_files}
+    'Jokes about Gulya😅': gulya_jokes,
+    '🤠 Chuck Norris Jokes 😁': chuck_norris_jokes,
+    '🗑️ Clear Files': delete_xlsx_files,
+    '🖼️ Delete PNG': delete_png_files
+}

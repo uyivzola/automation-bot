@@ -8,15 +8,17 @@ from sqlalchemy import create_engine
 from reports.formatter import formatter
 
 
-def top_generator(login, password):
+def top_generator():
     print('Started running top generator')
     env_file_path = 'D:/Projects/.env'
     load_dotenv(env_file_path)
 
     # Get today's date
     today_date = datetime.now().strftime('%d %b')
-    output_file_path = f'TOP ostatok - {today_date}.xlsx'
-    xikmat_file_path = f'TOP ostatok - Эвер-Ромфарм  - {today_date}.xlsx'
+    promotion_path = r'D:\Projects\promotion.xlsx'
+    output_file_path_x = f'TOP ostatok - {today_date}.xlsx'
+    projects_df = pd.read_excel(promotion_path, sheet_name='Projects')
+    corporative_products_path = f'TOP ostatok - NIKA  - {today_date}.xlsx'
     ots_file_path = f'TOP ostatok - OTS Project - {today_date}.xlsx'
     # Access the environment variables
     db_server = os.getenv("DB_SERVER")
@@ -63,29 +65,31 @@ def top_generator(login, password):
 
     # special for Xikmat
     manufacturers = ["Ever neuro pharma", "Ромфарм Компании - Румыния", "Ромфарм Комп/World Medicine"]
-    ots_products_df = ['Магвит №30', 'Риноксил Кидс 0,025% 10 мл спрей', 'Риноксил Формула+ 0,05 % 10 мл спрей',
-                       'Риноксил 0,1% 10мл спрей', 'Форсил со вкусом апельсина 3г №30', 'Авирол С №12',
-                       'Альцетро 5мг №20',
-                       'Доктор Синус 2,2г №30 пак.+уст-во для пром. п/носа', 'Риномакс Актив Таб №10',
-                       'Риномакс Бронхо пор. со вкусом апельсина 3г №10', 'Риномакс Хот  Лимон 22г №15 ',
-                       'Риномакс Хот Эффект Лимон 22г №15 ', 'Седоник №30 капс.',
-                       'Риномакс Инго 1,5мг/мл 30мл спрей орофарингеальный',
-                       'Омега-3-МИК 500мг №50 капс.',
-                       'Фарингоспрей 1,92мг/мл 30 мл спрей', 'Форсил Light 400 мг №10 капс.', 'Эрегра 100мг №4'
+    corporate_manufacturers = ['Nika-Pharm',
+                               'ТНК Силма /Россия',
+                               'Флумед-Фарм ООО/Молдова/',
+                               'Минскинтеркапс',
+                               'Selo Medical Австрия',
+                               'Рохто Фармасьютикал']
 
-                       ]
-    ots_df = result_df[result_df['Товар'].isin(ots_products_df)]
-    ots_df = ots_df.groupby(['Производитель', 'Товар', 'Selling Price']).agg(
-        {'остаток': 'sum', 'сумма': 'sum'}).reset_index()
-    xikmat_df = result_df[result_df['Производитель'].isin(manufacturers)]
-    xikmat_df = xikmat_df.groupby(['Производитель', 'Товар', 'Selling Price']).agg(
+    corporative_products = result_df[result_df['Производитель'].isin(corporate_manufacturers)]
+    corporative_products = corporative_products.groupby(['Производитель', 'Товар', 'Selling Price']).agg(
         {'остаток': 'sum', 'сумма': 'sum'}).reset_index()
 
-    xikmat_df.sort_values(by='сумма', ascending=False, inplace=True)
+    corporative_products.sort_values(by='сумма', ascending=False, inplace=True)
 
-    df.to_excel(output_file_path, index=False)
-    xikmat_df.to_excel(xikmat_file_path, index=False)
-    ots_df.to_excel(ots_file_path, index=False)
-    formatter(df, output_file_path)
-    formatter(xikmat_df, xikmat_file_path)
-    formatter(ots_df, ots_file_path)
+    df.to_excel(output_file_path_x, index=False)
+    corporative_products.to_excel(corporative_products_path, index=False)
+    # ots_df.to_excel(ots_file_path, index=False)
+    formatter(df, output_file_path_x)
+    formatter(corporative_products, corporative_products_path)
+
+    for project in projects_df['ProjectName'].unique():
+        for project_name in projects_df['ProjectName'].unique():
+            project_filtered_df = result_df[
+                result_df['Товар'].isin(projects_df[projects_df['ProjectName'] == project_name]['GoodName'])]
+            project_filtered_df = project_filtered_df.groupby(['Производитель', 'Товар', 'Selling Price']).agg(
+                {'остаток': 'sum', 'сумма': 'sum'}).reset_index()
+            output_file_path = f'TOP ostatok - {project_name} - {today_date}.xlsx'
+            project_filtered_df.to_excel(output_file_path, index=False)
+            formatter(project_filtered_df, output_file_path)
