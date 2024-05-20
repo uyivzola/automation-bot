@@ -3,5 +3,7 @@
 reports/trash_media
 /venv/
 *.xlsx
+*.xls
 *png
 *.ipynb
+project.log
